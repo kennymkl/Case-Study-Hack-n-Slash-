@@ -11,6 +11,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+//added libs
+import java.security.NoSuchAlgorithmException;
+import java.security.MessageDigest;
+import java.sql.SQLException;
+
 public class SQLite {
     
     public int DEBUG_MODE = 0;

@@ -25,7 +25,7 @@ public class Main {
         sqlite = new SQLite();
 
 //        // Create a database
-//        sqlite.createNewDatabase();
+        sqlite.createNewDatabase();
 //        
 //        // Drop users table if needed
 //        sqlite.dropHistoryTable();
@@ -34,10 +34,10 @@ public class Main {
 //        sqlite.dropUserTable();
 //        
 //        // Create users table if not exist
-//        sqlite.createHistoryTable();
-//        sqlite.createLogsTable();
-//        sqlite.createProductTable();
-//        sqlite.createUserTable();
+        sqlite.createHistoryTable();
+        sqlite.createLogsTable();
+        sqlite.createProductTable();
+        sqlite.createUserTable();
 //        
 //        // Add sample history
 //        sqlite.addHistory("admin", "Antivirus", 1, "2019-04-03 14:30:00.000");
