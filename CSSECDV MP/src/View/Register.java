@@ -1,14 +1,57 @@
 
 package View;
 
+
+import Controller.SQLite;
+import Model.User;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import javax.swing.JTextField;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+
+
+
+
 public class Register extends javax.swing.JPanel {
 
     public Frame frame;
+    private StringBuilder originalPassword = new StringBuilder();
+    private StringBuilder originalConfPass  = new StringBuilder();
+    private StringBuilder maskedPass = new StringBuilder();
+    private StringBuilder maskedConfPass = new StringBuilder();
+    public SQLite sqlite;
+    
     
     public Register() {
         initComponents();
+        passwordFld.setName("password");
+        confpassFld.setName("confirmPassword");
+        
     }
 
+    private void maskText(JTextField textField) {
+       
+        ((AbstractDocument) textField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+               // if text field is Password
+                if(textField.getName().equals("password")){
+                    originalPassword.append(text);
+                }
+                 // if text field is confirm Password
+                if(textField.getName().equals("confirmPassword")){
+                    originalConfPass.append(text);
+                }
+                super.replace(fb, offset, length, "*", attrs); // replace each character with '*'
+            }
+        });
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -32,6 +75,14 @@ public class Register extends javax.swing.JPanel {
         passwordFld.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         passwordFld.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         passwordFld.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "PASSWORD", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
+        passwordFld.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                passwordFldKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                passwordFldKeyTyped(evt);
+            }
+        });
 
         usernameFld.setBackground(new java.awt.Color(240, 240, 240));
         usernameFld.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -47,6 +98,14 @@ public class Register extends javax.swing.JPanel {
         confpassFld.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         confpassFld.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         confpassFld.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "CONFIRM PASSWORD", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
+        confpassFld.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                confpassFldKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                confpassFldKeyTyped(evt);
+            }
+        });
 
         backBtn.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         backBtn.setText("<Back");
@@ -95,16 +154,111 @@ public class Register extends javax.swing.JPanel {
                 .addContainerGap(64, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+    public static byte[] getSHA(String input) throws NoSuchAlgorithmException
+       {
+           MessageDigest md = MessageDigest.getInstance("SHA-256");
+           return md.digest(input.getBytes(StandardCharsets.UTF_8));
+       }
+
+       public static String toHexString(byte[] hash)
+       {
+          
+           BigInteger number = new BigInteger(1, hash);
+           StringBuilder hexString = new StringBuilder(number.toString(16));
+           while (hexString.length() < 64)
+           {
+               hexString.insert(0, '0');
+           }
+           return hexString.toString();
+       }
 
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
-        frame.registerAction(usernameFld.getText(), passwordFld.getText(), confpassFld.getText());
-        frame.loginNav();
+       
+        // check first for all existing users
+        
+        sqlite = new SQLite();
+        Boolean usernameExist = false;
+        ArrayList<User> users = sqlite.getUsers();
+        for(int nCtr = 0; nCtr < users.size(); nCtr++){
+            System.out.println(" Username: " + users.get(nCtr).getUsername());
+            if(users.get(nCtr).getUsername().equals(usernameFld.getText())){
+                usernameExist = true;
+                break;
+            }
+        }        
+        
+        System.out.println(usernameExist);
+      
+        if(usernameExist){
+            // implement here if the username already exist
+        }
+        
+        // NOTE CHANGE THIS ADD AN IF STATEMENT TO CHECK IF THE PASSWORD IS STRONG just like the one above. IMPLEMENT PASSWORD SECURE AND MATCHING
+        Boolean isPasswordSecure = true;
+        
+        
+        // if the username is unique and the password is secure, store the user
+        if(!usernameExist && isPasswordSecure){
+            // store to the database of the users
+            try{
+                String hashedPassword = toHexString(getSHA(originalPassword.toString()));
+                frame.registerAction(usernameFld.getText(), hashedPassword, hashedPassword);
+                System.out.println("ADDED USER: " + usernameFld.getText() + "\n" + originalPassword.toString() + "\n" + hashedPassword);
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+            }
+          
+           
+        }
+        
+        System.out.println("ORIGINAL PASSWORD: " +originalPassword);
+        System.out.println("CONFIRM PASSWORD: " + originalConfPass);
+        
+        
+        
+        //frame.loginNav();
     }//GEN-LAST:event_registerBtnActionPerformed
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
         frame.loginNav();
     }//GEN-LAST:event_backBtnActionPerformed
 
+    private void passwordFldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passwordFldKeyTyped
+        // calal the maskText everytime the key is pressed
+        maskText(passwordFld);
+    }//GEN-LAST:event_passwordFldKeyTyped
+
+    private void passwordFldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passwordFldKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_BACK_SPACE) {
+        // Get current caret position before backspace
+            int caretPositionBeforeBackspace = passwordFld.getCaretPosition()-1;
+        //  System.out.println(caretPositionBeforeBackspace);
+            if(caretPositionBeforeBackspace < 0){
+                return;
+            }
+            originalPassword.deleteCharAt(caretPositionBeforeBackspace);
+        }
+    }//GEN-LAST:event_passwordFldKeyPressed
+
+    private void confpassFldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_confpassFldKeyTyped
+        // TODO add your handling code here:
+        maskText(confpassFld);
+    }//GEN-LAST:event_confpassFldKeyTyped
+
+    private void confpassFldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_confpassFldKeyPressed
+        // TODO add your handling code here:
+         if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_BACK_SPACE) {
+        // Get current caret position before backspace
+            int caretPositionBeforeBackspace = confpassFld.getCaretPosition()-1;
+        //  System.out.println(caretPositionBeforeBackspace);
+            if(caretPositionBeforeBackspace < 0){
+                return;
+            }
+            originalConfPass.deleteCharAt(caretPositionBeforeBackspace);
+        }
+    }//GEN-LAST:event_confpassFldKeyPressed
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backBtn;

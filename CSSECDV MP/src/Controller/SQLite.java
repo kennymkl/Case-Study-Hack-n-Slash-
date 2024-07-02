@@ -14,6 +14,7 @@ import java.util.ArrayList;
 //added libs
 import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class SQLite {
@@ -185,20 +186,17 @@ public class SQLite {
     }
     
     public void addUser(String username, String password) {
-        String sql = "INSERT INTO users(username,password) VALUES('" + username + "','" + password + "')";
-        
-        try (Connection conn = DriverManager.getConnection(driverURL);
-            Statement stmt = conn.createStatement()){
-            stmt.execute(sql);
-            
-//      PREPARED STATEMENT EXAMPLE
-//      String sql = "INSERT INTO users(username,password) VALUES(?,?)";
-//      PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//      pstmt.setString(1, username);
-//      pstmt.setString(2, password);
-//      pstmt.executeUpdate();
-        } catch (Exception ex) {
-            System.out.print(ex);
+        // implemented prepared statement
+        try (Connection conn = DriverManager.getConnection(driverURL)) {
+            String sql = "INSERT INTO users(username, password) VALUES (?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+                
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println("Error inserting into database: " + ex.getMessage());
         }
     }
     
