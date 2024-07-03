@@ -11,12 +11,15 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import javax.swing.JOptionPane; 
 
 
 
@@ -54,7 +57,9 @@ public class Register extends javax.swing.JPanel {
             }
         });
     }
-    @SuppressWarnings("unchecked")
+    
+	
+	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -64,7 +69,11 @@ public class Register extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         confpassFld = new javax.swing.JTextField();
         backBtn = new javax.swing.JButton();
-
+		
+		passStrength = new javax.swing.JOptionPane();
+		
+		
+		
         registerBtn.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         registerBtn.setText("REGISTER");
         registerBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -85,6 +94,7 @@ public class Register extends javax.swing.JPanel {
                 passwordFldKeyTyped(evt);
             }
         });
+		
 
         usernameFld.setBackground(new java.awt.Color(240, 240, 240));
         usernameFld.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -180,6 +190,7 @@ public class Register extends javax.swing.JPanel {
         
         sqlite = new SQLite();
         Boolean usernameExist = false;
+		Boolean passValidity = false;
         ArrayList<User> users = sqlite.getUsers();
         for(int nCtr = 0; nCtr < users.size(); nCtr++){
             System.out.println(" Username: " + users.get(nCtr).getUsername());
@@ -196,11 +207,25 @@ public class Register extends javax.swing.JPanel {
         }
         
         // NOTE CHANGE THIS ADD AN IF STATEMENT TO CHECK IF THE PASSWORD IS STRONG just like the one above. IMPLEMENT PASSWORD SECURE AND MATCHING
-        Boolean isPasswordSecure = true;
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{15,}$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(originalPassword);
+		if (matcher.matches()) {
+			passValidity = true;
+		} else {
+			passValidity = false;
+		}
+		
+		if(passValidity == false){
+			JOptionPane.showMessageDialog(null, "Password must contain at least 1 lowercase letter\n"+
+												"Password must contain at least 1 uppercase letter\n"+
+												"Password must contain at least 1 number\n"+
+												"Password must contain at least 1 special character\n", "Warning", JOptionPane.INFORMATION_MESSAGE);
+		}
         
         
         // if the username is unique and the password is secure, store the user
-        if(!usernameExist && isPasswordSecure){
+        if(!usernameExist && passValidity){
             // store to the database of the users
             try{
                 String hashedPassword = toHexString(getSHA(originalPassword.toString()));
@@ -213,6 +238,8 @@ public class Register extends javax.swing.JPanel {
           
            
         }
+		
+		
         
         System.out.println("ORIGINAL PASSWORD: " +originalPassword);
         System.out.println("CONFIRM PASSWORD: " + originalConfPass);
@@ -221,6 +248,8 @@ public class Register extends javax.swing.JPanel {
         
         //frame.loginNav();
     }//GEN-LAST:event_registerBtnActionPerformed
+
+	
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
         frame.loginNav();
@@ -262,7 +291,9 @@ public class Register extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_confpassFldKeyPressed
     
-
+	private javax.swing.JOptionPane passStrength;
+	
+	
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backBtn;
     private javax.swing.JTextField confpassFld;
