@@ -187,23 +187,38 @@ public class Register extends javax.swing.JPanel {
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
        
         // check first for all existing users
-        
         sqlite = new SQLite();
         Boolean usernameExist = false;
 		Boolean passValidity = false;
         ArrayList<User> users = sqlite.getUsers();
-        for(int nCtr = 0; nCtr < users.size(); nCtr++){
-            System.out.println(" Username: " + users.get(nCtr).getUsername());
-            if(users.get(nCtr).getUsername().equals(usernameFld.getText())){
+        
+        // Gets username and lowerCase to check for case insensitivity
+        String username = usernameFld.getText();
+        String inputUsername = username.toLowerCase();
+        for (int nCtr = 0; nCtr < users.size(); nCtr++) {
+            String existingUsername = users.get(nCtr).getUsername().toLowerCase();
+            System.out.println(" Username: " + existingUsername);
+            if (existingUsername.equals(inputUsername)) {
                 usernameExist = true;
                 break;
             }
-        }        
+        }
+        // Checks for the username validity
         
+        String usernameRegex = "^[a-zA-Z0-9]{3,16}$";
+        Pattern usernamePattern = Pattern.compile(usernameRegex);
+        Matcher usernameMatcher = usernamePattern.matcher(username);
+            
         System.out.println(usernameExist);
-      
+        
         if(usernameExist){
-            // implement here if the username already exist
+            JOptionPane.showMessageDialog(null, "Username already exists. Please choose a different username.", "Warning", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        if (!usernameMatcher.matches()) {
+        JOptionPane.showMessageDialog(null, "Username must be between 3 and 16 characters and contain only alphanumeric characters.", "Warning", JOptionPane.INFORMATION_MESSAGE);
+        return;
         }
         
         // NOTE CHANGE THIS ADD AN IF STATEMENT TO CHECK IF THE PASSWORD IS STRONG just like the one above. IMPLEMENT PASSWORD SECURE AND MATCHING
