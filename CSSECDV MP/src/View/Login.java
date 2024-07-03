@@ -1,12 +1,18 @@
 
 package View;
 
+import Controller.SQLite;
+import Model.User;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
 public class Login extends javax.swing.JPanel {
 
     public Frame frame;
-    
+    public SQLite sqlite;
     public Login() {
         initComponents();
+        sqlite = new SQLite();
     }
 
     @SuppressWarnings("unchecked")
@@ -83,14 +89,49 @@ public class Login extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
-        frame.mainNav();
+        //TODO:
+        // check first if the user and password is in the database. [MAKE SURE THE PASSWORD IS HASHED SHA-256]
+        
+        // first check if the account is locked.
+        int accountLocked = isAccountLocked(usernameFld.getText());
+        if(accountLocked == 1){
+            JOptionPane.showMessageDialog(frame, "The account is locked.", "Account Status", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else if (accountLocked == 0){
+            // meaning if the account is unlock go to the login page
+            frame.mainNav();
+        }
+        
+        
+      
+        
+        
     }//GEN-LAST:event_loginBtnActionPerformed
 
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
         frame.registerNav();
     }//GEN-LAST:event_registerBtnActionPerformed
 
-
+    private int isAccountLocked(String username){
+         //returns 1 account is locked.
+        // returns 0 account is unlocked
+        // returns -1 means account is invalid
+       
+        ArrayList<User> users = sqlite.getUsers();
+         for(int nCtr = 0; nCtr < users.size(); nCtr++){
+            System.out.println("===== User " + users.get(nCtr).getId() + " =====");
+            System.out.println(" Username: " + users.get(nCtr).getUsername());
+            System.out.println(" Locked: " + users.get(nCtr).getLocked());
+            
+            if(username.equals(users.get(nCtr).getUsername())){
+                return users.get(nCtr).getLocked();
+            }
+            
+        }
+        return -1;
+         
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginBtn;
