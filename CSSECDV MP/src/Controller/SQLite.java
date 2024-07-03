@@ -320,4 +320,28 @@ public class SQLite {
         }
         return product;
     }
+    
+    public void updateLockAccountStatus(String username, int status){
+        String sql = "UPDATE users SET locked = ? WHERE username = ?";
+           
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+           
+            pstmt.setInt(1, status);  
+            pstmt.setString(2, username); 
+            // Execute the update
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("Account status updated successfully.");
+            } 
+            else {
+                System.out.println("No account found with the specified username.");
+            }
+        } catch (SQLException ex) {
+        // Handle any SQL exceptions
+            System.out.print(ex);
+        }
+            
+    }
 }

@@ -7,7 +7,9 @@ package View;
 
 import Controller.SQLite;
 import Model.User;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -210,12 +212,28 @@ public class MgmtUser extends javax.swing.JPanel {
             String state = "lock";
             if("1".equals(tableModel.getValueAt(table.getSelectedRow(), 3) + "")){
                 state = "unlock";
+                System.out.println("INSIDE HERE");
             }
             
             int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to " + state + " " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
             
             if (result == JOptionPane.YES_OPTION) {
-                System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
+                //System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
+                String accountName = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+                String accountStatus = tableModel.getValueAt(table.getSelectedRow(), 3).toString();
+                if(accountStatus.equals("0")){
+                    System.out.println("LOCK THIS ACCOUNT");
+                     sqlite.updateLockAccountStatus(accountName,1);
+                     sqlite.addLogs("NOTICE", accountName,"This account has been locked", new Timestamp(new Date().getTime()).toString());
+                }
+                if(accountStatus.equals("1")){
+                    System.out.println("UNLOCK THIS ACCOUNT");
+                    sqlite.updateLockAccountStatus(accountName,0);
+                    sqlite.addLogs("NOTICE", accountName,"This account has been unlocked", new Timestamp(new Date().getTime()).toString());
+                }
+     
+               
+                
             }
         }
     }//GEN-LAST:event_lockBtnActionPerformed

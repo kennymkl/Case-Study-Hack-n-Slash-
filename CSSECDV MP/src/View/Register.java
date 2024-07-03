@@ -8,7 +8,9 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -203,6 +205,7 @@ public class Register extends javax.swing.JPanel {
             try{
                 String hashedPassword = toHexString(getSHA(originalPassword.toString()));
                 frame.registerAction(usernameFld.getText(), hashedPassword, hashedPassword);
+                sqlite.addLogs("NOTICE", usernameFld.getText(), "User creation successful", new Timestamp(new Date().getTime()).toString());
                 System.out.println("ADDED USER: " + usernameFld.getText() + "\n" + originalPassword.toString() + "\n" + hashedPassword);
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
