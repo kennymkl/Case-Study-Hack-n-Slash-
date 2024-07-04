@@ -189,7 +189,8 @@ public class Register extends javax.swing.JPanel {
         // check first for all existing users
         sqlite = new SQLite();
         Boolean usernameExist = false;
-		Boolean passValidity = false;
+		Boolean passStrength = false;
+		Boolean passMatch = false;
         ArrayList<User> users = sqlite.getUsers();
         
         // Gets username and lowerCase to check for case insensitivity
@@ -226,12 +227,19 @@ public class Register extends javax.swing.JPanel {
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(originalPassword);
 		if (matcher.matches()) {
-			passValidity = true;
-		} else {
-			passValidity = false;
+			passStrength = true;
 		}
 		
-		if(passValidity == false){
+		if((originalPassword.toString().equals(originalConfPass.toString()))){
+				passMatch = true;
+		}
+		
+		if(passMatch == false){
+			System.out.println("Password does not match");
+			JOptionPane.showMessageDialog(null, "Password does not match", "Warning", JOptionPane.INFORMATION_MESSAGE);
+		}
+		
+		if(passStrength == false){
 			JOptionPane.showMessageDialog(null, "Password must contain at least 1 lowercase letter\n"+
 												"Password must contain at least 1 uppercase letter\n"+
 												"Password must contain at least 1 number\n"+
@@ -240,7 +248,7 @@ public class Register extends javax.swing.JPanel {
         
         
         // if the username is unique and the password is secure, store the user
-        if(!usernameExist && passValidity){
+        if(!usernameExist && && (passStrength && passMatch)){
             // store to the database of the users
             try{
                 String hashedPassword = toHexString(getSHA(originalPassword.toString()));
