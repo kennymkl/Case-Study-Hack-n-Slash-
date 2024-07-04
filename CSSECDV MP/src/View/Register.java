@@ -248,7 +248,7 @@ public class Register extends javax.swing.JPanel {
         
         
         // if the username is unique and the password is secure, store the user
-        if(!usernameExist && && (passStrength && passMatch)){
+        if(!usernameExist && (passStrength && passMatch)){
             // store to the database of the users
             try{
                 String hashedPassword = toHexString(getSHA(originalPassword.toString()));
