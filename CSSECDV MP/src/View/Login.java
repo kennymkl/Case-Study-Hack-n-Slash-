@@ -104,6 +104,7 @@ public class Login extends javax.swing.JPanel {
         
         
       
+        clearFields();
         
         
     }//GEN-LAST:event_loginBtnActionPerformed
@@ -130,6 +131,10 @@ public class Login extends javax.swing.JPanel {
         }
         return -1;
          
+    }
+    private void clearFields() {
+        usernameFld.setText("");
+        passwordFld.setText("");
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

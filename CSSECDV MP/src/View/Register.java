@@ -258,7 +258,7 @@ public class Register extends javax.swing.JPanel {
         
         System.out.println("ORIGINAL PASSWORD: " +originalPassword);
         System.out.println("CONFIRM PASSWORD: " + originalConfPass);
-        
+        clearFields();
         
         
         //frame.loginNav();
@@ -305,6 +305,26 @@ public class Register extends javax.swing.JPanel {
             originalConfPass.deleteCharAt(caretPositionBeforeBackspace);
         }
     }//GEN-LAST:event_confpassFldKeyPressed
+    private void removeDocumentFilter(JTextField textField) {
+        ((AbstractDocument) textField.getDocument()).setDocumentFilter(null);
+    }
+    private void clearFields() {
+    removeDocumentFilter(passwordFld);
+    removeDocumentFilter(confpassFld);
+
+    // Clear the text fields
+    usernameFld.setText("");
+    passwordFld.setText("");
+    confpassFld.setText("");
+
+    originalPassword.setLength(0);
+    originalConfPass.setLength(0);
+    maskedPass.setLength(0);
+    maskedConfPass.setLength(0);
+
+    maskText(passwordFld);
+    maskText(confpassFld);
+}
     
 	private javax.swing.JOptionPane passStrength;
 	
