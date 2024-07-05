@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.History;
+import Model.LoginAttempts;
 import Model.Logs;
 import Model.Product;
 import Model.User;
@@ -93,6 +94,22 @@ public class SQLite {
             + " password TEXT NOT NULL,\n"
             + " role INTEGER DEFAULT 2,\n"
             + " locked INTEGER DEFAULT 0\n"
+            + ");";
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Table users in database.db created.");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    public void createLogInAttempts() {
+        String sql = "CREATE TABLE IF NOT EXISTS login_attempts (\n"
+            + " id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+            + " username TEXT NOT NULL UNIQUE,\n"
+            + " attempts INTEGER DEFAULT 0,\n"
+            + " last_attempt TEXT NOT NULL\n"
             + ");";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
@@ -281,6 +298,54 @@ public class SQLite {
         } catch (Exception ex) {}
         return users;
     }
+    public ArrayList<LoginAttempts> getLoginAttempts(){
+        String sql = "SELECT id, username, attempts, last_attempt FROM login_attempts";
+        ArrayList<LoginAttempts> loginAttempts = new ArrayList<LoginAttempts>();
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)){
+            
+            while (rs.next()) {
+                loginAttempts.add(new LoginAttempts(rs.getInt("id"),
+                                   rs.getString("username"),
+                                   rs.getInt("attempts"),
+                                   rs.getString("last_attempt")));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return loginAttempts;
+    }
+    public void updateLoginAttempts(String username, String timestamp) {
+        String sqlSelect = "SELECT attempts FROM login_attempts WHERE username = ?";
+        String sqlInsert = "INSERT INTO login_attempts (username, attempts, last_attempt) VALUES (?, 1, ?)";
+        String sqlUpdate = "UPDATE login_attempts SET attempts = attempts + 1, last_attempt = ? WHERE username = ?";
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+             PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect);
+             PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert);
+             PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
+
+            pstmtSelect.setString(1, username);
+            ResultSet rs = pstmtSelect.executeQuery();
+
+            if (rs.next()) {
+                // User exists, update login attempts
+                pstmtUpdate.setString(1, timestamp);
+                pstmtUpdate.setString(2, username);
+                pstmtUpdate.executeUpdate();
+            } else {
+                // User does not exist, insert new record
+                pstmtInsert.setString(1, username);
+                pstmtInsert.setString(2, timestamp);
+                pstmtInsert.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     
     public void addUser(String username, String password, int role) {
         String sql = "INSERT INTO users(username,password,role) VALUES('" + username + "','" + password + "','" + role + "')";
@@ -343,5 +408,38 @@ public class SQLite {
             System.out.print(ex);
         }
             
+    }
+    public String getLockedTimestamp(String username) {
+        String sql = "SELECT last_attempt FROM login_attempts WHERE username = ?";
+        String lastAttempt = "";
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                lastAttempt = rs.getString("last_attempt");
+             
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return lastAttempt;
+    }
+    public void deleteLoginAttempt(String username){
+        String sql = "DELETE FROM login_attempts WHERE username = ?";
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.executeUpdate();
+            System.out.println("Deleted login attempt for username: " + username);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        
     }
 }

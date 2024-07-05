@@ -166,23 +166,23 @@ public class Register extends javax.swing.JPanel {
                 .addContainerGap(64, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-    public static byte[] getSHA(String input) throws NoSuchAlgorithmException
-       {
-           MessageDigest md = MessageDigest.getInstance("SHA-256");
-           return md.digest(input.getBytes(StandardCharsets.UTF_8));
-       }
-
-       public static String toHexString(byte[] hash)
-       {
-          
-           BigInteger number = new BigInteger(1, hash);
-           StringBuilder hexString = new StringBuilder(number.toString(16));
-           while (hexString.length() < 64)
-           {
-               hexString.insert(0, '0');
-           }
-           return hexString.toString();
-       }
+    public String generateSHA256(String input) {
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+                StringBuilder hexString = new StringBuilder();
+                for (byte b : hash) {
+                    String hex = Integer.toHexString(0xff & b);
+                    if (hex.length() == 1) {
+                        hexString.append('0');
+                    }
+                    hexString.append(hex);
+                }
+                return hexString.toString();
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+    }
 
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
        
@@ -251,10 +251,12 @@ public class Register extends javax.swing.JPanel {
         if(!usernameExist && (passStrength && passMatch)){
             // store to the database of the users
             try{
-                String hashedPassword = toHexString(getSHA(originalPassword.toString()));
+                String hashedPassword = generateSHA256(originalPassword.toString()+ "supersecuresaltsecdev6969");
                 frame.registerAction(usernameFld.getText(), hashedPassword, hashedPassword);
                 sqlite.addLogs("NOTICE", usernameFld.getText(), "User creation successful", new Timestamp(new Date().getTime()).toString());
                 System.out.println("ADDED USER: " + usernameFld.getText() + "\n" + originalPassword.toString() + "\n" + hashedPassword);
+                frame.loginNav();
+                
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
             }

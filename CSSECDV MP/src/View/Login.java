@@ -2,19 +2,107 @@
 package View;
 
 import Controller.SQLite;
+import Model.LoginAttempts;
 import Model.User;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JTextField;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 public class Login extends javax.swing.JPanel {
 
     public Frame frame;
     public SQLite sqlite;
+    
+    private StringBuilder originalPassword = new StringBuilder();
+    private int maxLoginAttempts = 3;
     public Login() {
         initComponents();
         sqlite = new SQLite();
+        
+    }
+    public String generateSHA256(String input) {
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+                StringBuilder hexString = new StringBuilder();
+                for (byte b : hash) {
+                    String hex = Integer.toHexString(0xff & b);
+                    if (hex.length() == 1) {
+                        hexString.append('0');
+                    }
+                    hexString.append(hex);
+                }
+                return hexString.toString();
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+    }
+    
+    private Boolean checkIfValidUsername() {
+        Boolean validUser = false;
+        ArrayList<User> users = sqlite.getUsers();
+        // Gets username and lowerCase to check for case insensitivity
+        String username = usernameFld.getText();
+        String inputUsername = username.toLowerCase();
+        for (int nCtr = 0; nCtr < users.size(); nCtr++) {
+            String existingUsername = users.get(nCtr).getUsername().toLowerCase();
+            if (existingUsername.equals(inputUsername)){
+                validUser = true;
+            }
+        }
+        return validUser;
+    }
+    private Boolean checkIfCorrectPassword(){
+        Boolean validUser = false;
+        ArrayList<User> users = sqlite.getUsers();
+        // Gets username and lowerCase to check for case insensitivity
+        String username = usernameFld.getText();
+        String inputUsername = username.toLowerCase();
+        String inputPassword = generateSHA256(originalPassword.toString()+"supersecuresaltsecdev6969");
+        for (int nCtr = 0; nCtr < users.size(); nCtr++) {
+            String existingUsername = users.get(nCtr).getUsername().toLowerCase();
+            String password = users.get(nCtr).getPassword();
+            if (existingUsername.equals(inputUsername) && inputPassword.equals(password)){
+                validUser = true;
+            }
+        }
+        return validUser;
+    }
+    public int getNumberOfAttempts(String username){
+        ArrayList<LoginAttempts> attempts = sqlite.getLoginAttempts();
+        String inputUsername = username.toLowerCase();
+        int attempt = 0;
+        for(int nCtr = 0; nCtr < attempts.size(); nCtr++){
+            
+            if(inputUsername.equals(attempts.get(nCtr).getUsername())){
+           
+                attempt = attempts.get(nCtr).getAttempts();
+            
+            }
+            
+          
+            
+           
+        }
+        
+        return attempt;
     }
 
     @SuppressWarnings("unchecked")
@@ -42,6 +130,14 @@ public class Login extends javax.swing.JPanel {
         passwordFld.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         passwordFld.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         passwordFld.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "PASSWORD", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
+        passwordFld.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                passwordFldKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                passwordFldKeyTyped(evt);
+            }
+        });
 
         registerBtn.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         registerBtn.setText("REGISTER");
@@ -107,26 +203,111 @@ public class Login extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
-        //TODO:
-        // check first if the user and password is in the database. [MAKE SURE THE PASSWORD IS HASHED SHA-256]
+
+        Boolean validUsername = checkIfValidUsername();
+        Boolean validPassword = checkIfCorrectPassword();
         
-        // first check if the account is locked.
+        // number of attempts
+        int numberOfAttempts = getNumberOfAttempts(usernameFld.getText());
         int accountLocked = isAccountLocked(usernameFld.getText());
+        
+        // if the account is locked prompt the user that the account is locked
         if(accountLocked == 1){
-            JOptionPane.showMessageDialog(frame, "The account is locked.", "Account Status", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "The account is locked. Please contact admin", "Account Status", JOptionPane.INFORMATION_MESSAGE);
+            clearFields();
         }
-        else if (accountLocked == 0){
-            // meaning if the account is unlock go to the login page
+        // if the account is not locked and the number of login attempts is less than max login attempts, increment it.
+        else if(validUsername && !validPassword && numberOfAttempts < maxLoginAttempts && accountLocked ==0){
+            // update the login attempts
+            sqlite.updateLoginAttempts(usernameFld.getText(),new Timestamp(new Date().getTime()).toString());
+      
+            // show that the username or password is incorrect
+            JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
+            
+            numberOfAttempts = getNumberOfAttempts(usernameFld.getText());
+            // if number of attempts is >= 3 update the timestamp to add 5 minutes
+            if (numberOfAttempts >= maxLoginAttempts) {
+                // Update the timestamp to current time + 2 minutes
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                cal.add(Calendar.MINUTE, 2); 
+                Timestamp newTimestamp = new Timestamp(cal.getTime().getTime());
+                // Update the database with the new timestamp
+                sqlite.updateLoginAttempts(usernameFld.getText(), newTimestamp.toString());
+            }
+            clearFields(); 
+        }
+        // if the account is locked and reached the number of maximum attempts prompt the user for 2 minutes
+        // if the 2 minutes is done, delete the record from the database
+        else if (validUsername && !validPassword && numberOfAttempts >= maxLoginAttempts && accountLocked == 0){
+            
+            accountLockedDueToExcessAttempts();
+            clearFields();  
+        }
+        else if (!validUsername || !validPassword && accountLocked == 0){
+            JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
+            clearFields();
+        }
+        else if (numberOfAttempts >= maxLoginAttempts){
+            accountLockedDueToExcessAttempts();
+        }
+        else if (validUsername && validPassword && accountLocked ==0 && numberOfAttempts < maxLoginAttempts){
+            // delete the record in the login attempt
+            System.out.println(numberOfAttempts);
+            sqlite.deleteLoginAttempt(usernameFld.getText());
+            clearFields();
+         
+            // go to the next page
+            // AARON DO THIS PART
             frame.mainNav();
         }
-        
-        
-      
-        clearFields();
-        
-        
     }//GEN-LAST:event_loginBtnActionPerformed
 
+    private void accountLockedDueToExcessAttempts(){
+        Boolean validUsername = checkIfValidUsername();
+        Boolean validPassword = checkIfCorrectPassword();
+        
+        // number of attempts
+        int accountLocked = isAccountLocked(usernameFld.getText());
+        
+        String lockedTime = sqlite.getLockedTimestamp(usernameFld.getText());
+            System.out.println(lockedTime);
+            sqlite.addLogs("WARNING", usernameFld.getText(), "Account has been locked due to many attempts", new Timestamp(new Date().getTime()).toString());
+            // convert to timestamp
+            Timestamp lockedTimestamp = Timestamp.valueOf(lockedTime);
+            // Get the current timestamp
+            Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+            
+            // if the current timestamp is before the locked timestamp, prompt that the account is locked
+            if (lockedTimestamp != null && currentTimestamp.before(lockedTimestamp)) {
+        
+                JOptionPane.showMessageDialog(frame, "The account is locked. Please try again in 2 minutes.", "Temporarily Locked Account", JOptionPane.INFORMATION_MESSAGE);
+            } 
+             // Account lock time expired delete the record and check if the username and password is valid
+            else {
+                sqlite.deleteLoginAttempt(usernameFld.getText());
+                
+                // after deleting the login attempt we check if the account is valid
+                if(validUsername && validPassword && accountLocked ==0){
+                    sqlite.deleteLoginAttempt(usernameFld.getText());
+                    clearFields();
+                    
+                    // GO TO THE NEXT PAGE
+                    // AARON PART
+                    frame.mainNav();
+                    
+                }
+                // if the account is invalid
+                else if (validUsername && !validPassword){
+                    sqlite.updateLoginAttempts(usernameFld.getText(),new Timestamp(new Date().getTime()).toString());
+                    JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
+                    clearFields();
+                }
+                
+                
+            }
+        clearFields();
+    }
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
         frame.registerNav();
     }//GEN-LAST:event_registerBtnActionPerformed
@@ -148,6 +329,24 @@ public class Login extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_forgotPasswordBtnMouseClicked
 
+    private void passwordFldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passwordFldKeyTyped
+        // TODO add your handling code here:
+        maskText(passwordFld);
+    }//GEN-LAST:event_passwordFldKeyTyped
+
+    private void passwordFldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passwordFldKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_BACK_SPACE) {
+        // Get current caret position before backspace
+            int caretPositionBeforeBackspace = passwordFld.getCaretPosition()-1;
+        //  System.out.println(caretPositionBeforeBackspace);
+            if(caretPositionBeforeBackspace < 0){
+                return;
+            }
+            originalPassword.deleteCharAt(caretPositionBeforeBackspace);
+        }
+    }//GEN-LAST:event_passwordFldKeyPressed
+
     private int isAccountLocked(String username){
          //returns 1 account is locked.
         // returns 0 account is unlocked
@@ -155,10 +354,10 @@ public class Login extends javax.swing.JPanel {
        
         ArrayList<User> users = sqlite.getUsers();
          for(int nCtr = 0; nCtr < users.size(); nCtr++){
-            System.out.println("===== User " + users.get(nCtr).getId() + " =====");
-            System.out.println(" Username: " + users.get(nCtr).getUsername());
-            System.out.println(" Locked: " + users.get(nCtr).getLocked());
-            
+//            System.out.println("===== User " + users.get(nCtr).getId() + " =====");
+//            System.out.println(" Username: " + users.get(nCtr).getUsername());
+//            System.out.println(" Locked: " + users.get(nCtr).getLocked());
+//            
             if(username.equals(users.get(nCtr).getUsername())){
                 return users.get(nCtr).getLocked();
             }
@@ -168,10 +367,28 @@ public class Login extends javax.swing.JPanel {
          
     }
     private void clearFields() {
+        
+        removeDocumentFilter(passwordFld);
         usernameFld.setText("");
         passwordFld.setText("");
+        
+        originalPassword.setLength(0);
+        
+        maskText(passwordFld);
     }
-    
+    private void maskText(JTextField textField) {
+       
+        ((AbstractDocument) textField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                originalPassword.append(text);
+                super.replace(fb, offset, length, "*", attrs); // replace each character with '*'
+            }
+        });
+    }
+     private void removeDocumentFilter(JTextField textField) {
+        ((AbstractDocument) textField.getDocument()).setDocumentFilter(null);
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel forgotPasswordBtn;
     private javax.swing.JLabel jLabel1;
