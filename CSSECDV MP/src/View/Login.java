@@ -226,7 +226,7 @@ public class Login extends javax.swing.JPanel {
         else if(validUsername && !validPassword && numberOfAttempts < maxLoginAttempts && accountLocked ==0){
             // update the login attempts
             sqlite.updateLoginAttempts(usernameFld.getText(),new Timestamp(new Date().getTime()).toString());
-            sqlite.addLogs("WARNING", usernameFld.getText(), "Log In attempt incorrect password", new Timestamp(new Date().getTime()).toString());
+            sqlite.addLogs("WARNING", usernameFld.getText(), "Login attempt incorrect credentials", new Timestamp(new Date().getTime()).toString());
       
             // show that the username or password is incorrect
             JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
@@ -282,7 +282,7 @@ public class Login extends javax.swing.JPanel {
         
         String lockedTime = sqlite.getLockedTimestamp(usernameFld.getText());
             System.out.println(lockedTime);
-            sqlite.addLogs("WARNING", usernameFld.getText(), "Account is locked and attempting to login.", new Timestamp(new Date().getTime()).toString());
+            sqlite.addLogs("WARNING", usernameFld.getText(), "Login attempt incorrect credentials.", new Timestamp(new Date().getTime()).toString());
             // convert to timestamp
             Timestamp lockedTimestamp = Timestamp.valueOf(lockedTime);
             // Get the current timestamp
