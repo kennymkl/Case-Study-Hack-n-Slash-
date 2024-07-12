@@ -4,26 +4,24 @@ package View;
 import Controller.SQLite;
 import Model.LoginAttempts;
 import Model.User;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
-import javax.swing.JOptionPane;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
+import javax.swing.*;
+import java.util.Arrays;
+
+import javax.swing.JOptionPane;
+import java.util.Properties;
+import java.util.Random;
 
 public class Login extends javax.swing.JPanel {
 
@@ -313,19 +311,83 @@ public class Login extends javax.swing.JPanel {
     }//GEN-LAST:event_registerBtnActionPerformed
 
     private void forgotPasswordBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_forgotPasswordBtnMouseClicked
-        Object[] options = {"Enter"};
-        String username = JOptionPane.showInputDialog(frame, "Enter Username", "Forgot Password", JOptionPane.PLAIN_MESSAGE);
-        
-        // Check username validity ---> unsure if Im supposed to do this to keep username animosity
-//        String usernameRegex = "^[a-zA-Z0-9]{3,16}$";
-//        Pattern usernamePattern = Pattern.compile(usernameRegex);
-//        Matcher usernameMatcher = usernamePattern.matcher(username);
-//        if (!usernameMatcher.matches()) {
-//            JOptionPane.showMessageDialog(frame, "Username must be between 3 and 16 characters and contain only alphanumeric characters.");
+//        Object[] options = {"Enter"};
+//        String username = JOptionPane.showInputDialog(frame, "Enter Username", "Forgot Password", JOptionPane.PLAIN_MESSAGE);
+//        
+//        // Check username validity ---> unsure if Im supposed to do this to keep username animosity
+////        String usernameRegex = "^[a-zA-Z0-9]{3,16}$";
+////        Pattern usernamePattern = Pattern.compile(usernameRegex);
+////        Matcher usernameMatcher = usernamePattern.matcher(username);
+////        if (!usernameMatcher.matches()) {
+////            JOptionPane.showMessageDialog(frame, "Username must be between 3 and 16 characters and contain only alphanumeric characters.");
+////        }
+//        
+//        if(username != null) {
+//            JOptionPane.showMessageDialog(frame, "Request for password reset has been sent to your email");
 //        }
-        
-        if(username != null) {
-            JOptionPane.showMessageDialog(frame, "Request for password reset has been sent to your email");
+
+        String username = JOptionPane.showInputDialog(null, "Enter your username:");
+
+        if (username != null && !username.isEmpty()) {
+            // Step 2: Generate a verification code
+            Random random = new Random();
+            int verificationCode = 100000 + random.nextInt(900000); // Generate a 6-digit code
+
+            // Step 3: Send the verification code via email (this part is commented out)
+            // String to = "user@example.com"; // Fetch user's email from the database if available
+            // String from = "secdv.grp1user@gmail.com";
+            // String host = "smtp.gmail.com";
+            // Properties properties = System.getProperties();
+            // properties.put("mail.smtp.host", host);
+            // properties.put("mail.smtp.port", "465");
+            // properties.put("mail.smtp.ssl.enable", "true");
+            // properties.put("mail.smtp.auth", "true");
+            // Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+            //    protected PasswordAuthentication getPasswordAuthentication() {
+            //        return new PasswordAuthentication("secdv.grp1user@gmail.com", "awmf vgiu kdda eyny");
+            //    }
+            // });
+            // try {
+            //    MimeMessage message = new MimeMessage(session);
+            //    message.setFrom(new InternetAddress(from));
+            //    message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            //    message.setSubject("Your Verification Code");
+            //    message.setText("Your verification code is: " + verificationCode);
+            //    Transport.send(message);
+            //    System.out.println("Verification code sent successfully.");
+            // } catch (MessagingException mex) {
+            //    mex.printStackTrace();
+            // }
+
+            // Step 4: Ask the user to enter the verification code
+            JOptionPane.showMessageDialog(null, "Verification code has been sent to your email: " + verificationCode);
+            String userInputCode = JOptionPane.showInputDialog(null, "Enter the verification code sent to your email:");
+
+            // Step 5: Validate the entered code
+            if (String.valueOf(verificationCode).equals(userInputCode)) {
+                // Step 6: Allow the user to change the password
+                JPasswordField passwordField = new JPasswordField();
+                int option = JOptionPane.showConfirmDialog(null, passwordField, "Enter your new password:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                if (option == JOptionPane.OK_OPTION) {
+                    char[] passwordChars = passwordField.getPassword();
+                    String newPassword = new String(passwordChars);
+                    Arrays.fill(passwordChars, ' '); // Clear the password array for security
+
+                    String hashedPassword = generateSHA256(newPassword + "supersecuresaltsecdev6969");
+
+                    // Change password and update log
+                    sqlite.updateUserPassword(username, hashedPassword);
+                    sqlite.addLogs("NOTICE", username, "User changed password", new Timestamp(new Date().getTime()).toString());
+                    JOptionPane.showMessageDialog(null, "Password changed successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Password change canceled.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Incorrect verification code. Please try again.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Username cannot be empty.");
         }
     }//GEN-LAST:event_forgotPasswordBtnMouseClicked
 

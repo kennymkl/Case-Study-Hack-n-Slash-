@@ -18,6 +18,7 @@ import java.security.MessageDigest;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+
 public class SQLite {
     
     public int DEBUG_MODE = 0;
@@ -441,5 +442,24 @@ public class SQLite {
             ex.printStackTrace();
         }
         
+    }
+    
+    public void updateUserPassword(String username, String newPassword) {
+        String sql = "UPDATE users SET password = ? WHERE username = ?";
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, username);
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("Password updated successfully.");
+            } else {
+                System.out.println("No account found with the specified username.");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 }
