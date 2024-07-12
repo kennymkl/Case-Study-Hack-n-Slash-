@@ -29,6 +29,8 @@ import javax.mail.internet.*;
 
 public class Login extends javax.swing.JPanel {
 
+    private String username;
+    
     public Frame frame;
     public SQLite sqlite;
     
@@ -67,6 +69,7 @@ public class Login extends javax.swing.JPanel {
             String existingUsername = users.get(nCtr).getUsername().toLowerCase();
             if (existingUsername.equals(inputUsername)){
                 validUser = true;
+                this.username = inputUsername;
             }
         }
         return validUser;
@@ -82,6 +85,8 @@ public class Login extends javax.swing.JPanel {
             String existingUsername = users.get(nCtr).getUsername().toLowerCase();
             String password = users.get(nCtr).getPassword();
             if (existingUsername.equals(inputUsername) && inputPassword.equals(password)){
+                System.out.println(password);
+                System.out.println(inputPassword);
                 validUser = true;
             }
         }
@@ -258,10 +263,7 @@ public class Login extends javax.swing.JPanel {
             System.out.println(numberOfAttempts);
             sqlite.deleteLoginAttempt(usernameFld.getText());
             clearFields();
-         
-            // go to the next page
-            // AARON DO THIS PART
-            frame.mainNav();
+            frame.mainNav(username);
         }
     }//GEN-LAST:event_loginBtnActionPerformed
     
@@ -293,10 +295,8 @@ public class Login extends javax.swing.JPanel {
                 if(validUsername && validPassword && accountLocked ==0){
                     sqlite.deleteLoginAttempt(usernameFld.getText());
                     clearFields();
-                    
-                    // GO TO THE NEXT PAGE
-                    // AARON PART
-                    frame.mainNav();
+                    System.out.println("this"+username);
+                    frame.mainNav(username);
                     
                 }
                 // if the account is invalid
