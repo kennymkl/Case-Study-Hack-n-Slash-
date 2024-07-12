@@ -33,7 +33,7 @@ public class Login extends javax.swing.JPanel {
     public SQLite sqlite;
     
     private StringBuilder originalPassword = new StringBuilder();
-    private int maxLoginAttempts = 3;
+    private int maxLoginAttempts = 5;
     public Login() {
         initComponents();
         sqlite = new SQLite();
@@ -214,14 +214,19 @@ public class Login extends javax.swing.JPanel {
         int accountLocked = isAccountLocked(usernameFld.getText());
         
         // if the account is locked prompt the user that the account is locked
-        if(accountLocked == 1){
+        if(accountLocked == 1 && validUsername && validPassword){
             JOptionPane.showMessageDialog(frame, "The account is locked. Please contact admin", "Account Status", JOptionPane.INFORMATION_MESSAGE);
+            clearFields();
+        }
+        else if(accountLocked == 1 && (!validUsername || !validPassword)){
+            JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
             clearFields();
         }
         // if the account is not locked and the number of login attempts is less than max login attempts, increment it.
         else if(validUsername && !validPassword && numberOfAttempts < maxLoginAttempts && accountLocked ==0){
             // update the login attempts
             sqlite.updateLoginAttempts(usernameFld.getText(),new Timestamp(new Date().getTime()).toString());
+            sqlite.addLogs("WARNING", usernameFld.getText(), "Log In attempt incorrect password", new Timestamp(new Date().getTime()).toString());
       
             // show that the username or password is incorrect
             JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
@@ -229,13 +234,15 @@ public class Login extends javax.swing.JPanel {
             numberOfAttempts = getNumberOfAttempts(usernameFld.getText());
             // if number of attempts is >= 3 update the timestamp to add 5 minutes
             if (numberOfAttempts >= maxLoginAttempts) {
-                // Update the timestamp to current time + 2 minutes
+                // Update the timestamp to current time + 15 minutes
+                
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(new Date());
-                cal.add(Calendar.MINUTE, 2); 
+                cal.add(Calendar.MINUTE, 15); 
                 Timestamp newTimestamp = new Timestamp(cal.getTime().getTime());
                 // Update the database with the new timestamp
                 sqlite.updateLoginAttempts(usernameFld.getText(), newTimestamp.toString());
+                
             }
             clearFields(); 
         }
@@ -250,6 +257,7 @@ public class Login extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
             clearFields();
         }
+        
         else if (numberOfAttempts >= maxLoginAttempts){
             accountLockedDueToExcessAttempts();
         }
@@ -274,7 +282,7 @@ public class Login extends javax.swing.JPanel {
         
         String lockedTime = sqlite.getLockedTimestamp(usernameFld.getText());
             System.out.println(lockedTime);
-            sqlite.addLogs("WARNING", usernameFld.getText(), "Account has been locked due to many attempts", new Timestamp(new Date().getTime()).toString());
+            sqlite.addLogs("WARNING", usernameFld.getText(), "Account is locked and attempting to login.", new Timestamp(new Date().getTime()).toString());
             // convert to timestamp
             Timestamp lockedTimestamp = Timestamp.valueOf(lockedTime);
             // Get the current timestamp
@@ -283,7 +291,7 @@ public class Login extends javax.swing.JPanel {
             // if the current timestamp is before the locked timestamp, prompt that the account is locked
             if (lockedTimestamp != null && currentTimestamp.before(lockedTimestamp)) {
         
-                JOptionPane.showMessageDialog(frame, "The account is locked. Please try again in 2 minutes.", "Temporarily Locked Account", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "The account is locked. Please try again in 15 minutes.", "Temporarily Locked Account", JOptionPane.INFORMATION_MESSAGE);
             } 
              // Account lock time expired delete the record and check if the username and password is valid
             else {
