@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern; 
 
 /**
  *
@@ -161,7 +163,16 @@ public class MgmtHistory extends javax.swing.JPanel {
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtnActionPerformed
         JTextField searchFld = new JTextField("0");
         designer(searchFld, "SEARCH USERNAME OR PRODUCT");
-
+        
+        //check if user input for search for users is valid
+        
+        
+        //String searchRegex = "^[a-zA-Z0-9]{3,16}$";
+        //Pattern searchPattern = Pattern.compile(searchRegex);
+        //Matcher searchMatcher = searchPattern.matcher(searchQuery);
+        
+        
+        
         Object[] message = {
             searchFld
         };
@@ -170,28 +181,44 @@ public class MgmtHistory extends javax.swing.JPanel {
 
         if (result == JOptionPane.OK_OPTION) {
 //          CLEAR TABLE
-            for(int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--){
-                tableModel.removeRow(0);
-            }
-
-//          LOAD CONTENTS
-            ArrayList<History> history = sqlite.getHistory();
-            for(int nCtr = 0; nCtr < history.size(); nCtr++){
-                if(searchFld.getText().contains(history.get(nCtr).getUsername()) || 
-                   history.get(nCtr).getUsername().contains(searchFld.getText()) || 
-                   searchFld.getText().contains(history.get(nCtr).getName()) || 
-                   history.get(nCtr).getName().contains(searchFld.getText())){
-                
-                    Product product = sqlite.getProduct(history.get(nCtr).getName());
-                    tableModel.addRow(new Object[]{
-                        history.get(nCtr).getUsername(), 
-                        history.get(nCtr).getName(), 
-                        history.get(nCtr).getStock(), 
-                        product.getPrice(), 
-                        product.getPrice() * history.get(nCtr).getStock(), 
-                        history.get(nCtr).getTimestamp()
-                    });
+            String searchQuery = searchFld.getText();
+            System.out.print(searchQuery);
+            
+            // Define regex pattern
+            String regex ="^[a-zA-Z0-9]{3,16}$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(searchQuery);
+            
+            
+            if(matcher.matches()){
+                System.out.println(matcher.matches());
+                for(int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--){
+                    tableModel.removeRow(0);
                 }
+
+    //          LOAD CONTENTS
+                ArrayList<History> history = sqlite.getHistory();
+                for(int nCtr = 0; nCtr < history.size(); nCtr++){
+                    if(searchFld.getText().contains(history.get(nCtr).getUsername()) || 
+                       history.get(nCtr).getUsername().contains(searchFld.getText()) || 
+                       searchFld.getText().contains(history.get(nCtr).getName()) || 
+                       history.get(nCtr).getName().contains(searchFld.getText())){
+
+                        Product product = sqlite.getProduct(history.get(nCtr).getName());
+                        tableModel.addRow(new Object[]{
+                            history.get(nCtr).getUsername(), 
+                            history.get(nCtr).getName(), 
+                            history.get(nCtr).getStock(), 
+                            product.getPrice(), 
+                            product.getPrice() * history.get(nCtr).getStock(), 
+                            history.get(nCtr).getTimestamp()
+                        });
+                    }
+                }
+            }else{
+                System.out.println(matcher.matches());
+                JOptionPane.showMessageDialog(null, "Username must be between 3 and 16 characters and contain only alphanumeric characters.", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                
             }
         }
     }//GEN-LAST:event_searchBtnActionPerformed

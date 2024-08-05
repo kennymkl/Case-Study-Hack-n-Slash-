@@ -8,6 +8,8 @@ package View;
 import Controller.SQLite;
 import Model.Product;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -175,7 +177,7 @@ public class MgmtProduct extends javax.swing.JPanel {
 
     private void purchaseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_purchaseBtnActionPerformed
         if(table.getSelectedRow() >= 0){
-            JTextField stockFld = new JTextField("0");
+            JTextField stockFld = new JTextField();
             designer(stockFld, "PRODUCT STOCK");
 
             Object[] message = {
@@ -185,7 +187,21 @@ public class MgmtProduct extends javax.swing.JPanel {
             int result = JOptionPane.showConfirmDialog(null, message, "PURCHASE PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
             if (result == JOptionPane.OK_OPTION) {
-                System.out.println(stockFld.getText());
+                //System.out.println(stockFld.getText());
+                String stockAvail = stockFld.getText();
+                int numStock = Integer.parseInt(stockAvail);
+                try{
+                    int numberAvail = (Integer) tableModel.getValueAt(table.getSelectedRow(), 1);
+                    
+                    if(numStock <= numberAvail){
+                        //do something
+                        System.out.println("Purchase request okay");
+                    }else{
+                        JOptionPane.showMessageDialog(null, "Request not available", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }catch(ClassCastException e){
+                    JOptionPane.showMessageDialog(null, "Request not available", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         }
     }//GEN-LAST:event_purchaseBtnActionPerformed
@@ -204,11 +220,46 @@ public class MgmtProduct extends javax.swing.JPanel {
         };
 
         int result = JOptionPane.showConfirmDialog(null, message, "ADD PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
-
+        
         if (result == JOptionPane.OK_OPTION) {
-            System.out.println(nameFld.getText());
-            System.out.println(stockFld.getText());
-            System.out.println(priceFld.getText());
+            String prodName = nameFld.getText();
+            String prodStock = stockFld.getText();
+            String prodPrice = priceFld.getText();
+            
+            //input val for product name
+            String regex ="^[a-zA-Z0-9 ]{1,30}$";
+            Pattern prodNamePattern = Pattern.compile(regex);
+            Matcher prodNameMatcher = prodNamePattern.matcher(prodName);
+            if(prodNameMatcher.matches()){
+                //do something
+                System.out.println("true prodname");
+            }else{
+                JOptionPane.showMessageDialog(null, "Input a valid name using alphanumeric characters at least 30 characters long.", "Warning", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+            //input validation for prod stock
+            int numStock = Integer.parseInt(prodStock);
+            
+            if(numStock <= 200 && numStock >= 0){
+                //do something
+                System.out.println("True prodstock");
+            }else{
+                JOptionPane.showMessageDialog(null, "Cannot store anymore of the product", "Warning", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+            //input val for price
+            try {
+                float numPrice = Float.parseFloat(prodPrice);
+                if(numPrice <= 10000 && numPrice >= 0){
+                    //do something
+                    System.out.println("True prod price");
+                }else{
+                    JOptionPane.showMessageDialog(null, "Product price is out of bounds", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Input a valid price format", "Warning", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
         }
     }//GEN-LAST:event_addBtnActionPerformed
 
@@ -229,9 +280,43 @@ public class MgmtProduct extends javax.swing.JPanel {
             int result = JOptionPane.showConfirmDialog(null, message, "EDIT PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
             if (result == JOptionPane.OK_OPTION) {
-                System.out.println(nameFld.getText());
-                System.out.println(stockFld.getText());
-                System.out.println(priceFld.getText());
+                String prodName = nameFld.getText();
+                String prodStock = stockFld.getText();
+                String prodPrice = priceFld.getText();
+
+                //input val for product name
+                String regex ="^[a-zA-Z0-9 ]{1,30}$";
+                Pattern prodNamePattern = Pattern.compile(regex);
+                Matcher prodNameMatcher = prodNamePattern.matcher(prodName);
+                if(prodNameMatcher.matches()){
+                    //do something
+                    System.out.println("true prodname");
+                }else{
+                    JOptionPane.showMessageDialog(null, "Input a valid name using alphanumeric characters at least 30 characters long.", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+                //input validation for prod stock
+                int numStock = Integer.parseInt(prodStock);
+
+                if(numStock <= 200 && numStock >= 0){
+                    //do something
+                    System.out.println("True prodstock");
+                }else{
+                    JOptionPane.showMessageDialog(null, "Cannot store anymore of the product", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+                //input val for price
+                try {
+                    float numPrice = Float.parseFloat(prodPrice);
+                    if(numPrice <= 10000 && numPrice >= 0){
+                        //do something
+                        System.out.println("True prod price");
+                    }else{
+                        JOptionPane.showMessageDialog(null, "Product price is out of bounds", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Input a valid price format", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         }
     }//GEN-LAST:event_editBtnActionPerformed
