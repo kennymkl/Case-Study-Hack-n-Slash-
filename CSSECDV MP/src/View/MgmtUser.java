@@ -10,6 +10,8 @@ import Model.User;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -242,6 +244,8 @@ public class MgmtUser extends javax.swing.JPanel {
         if(table.getSelectedRow() >= 0){
             JTextField password = new JPasswordField();
             JTextField confpass = new JPasswordField();
+            Boolean passStrength = false;
+            Boolean passMatch = false;
             designer(password, "PASSWORD");
             designer(confpass, "CONFIRM PASSWORD");
             
@@ -254,6 +258,33 @@ public class MgmtUser extends javax.swing.JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 System.out.println(password.getText());
                 System.out.println(confpass.getText());
+                
+                String origPass = password.getText();
+                String confPass = confpass.getText();
+                
+                //checks if password is strong
+                String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{15,}$";
+                Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(origPass);
+                
+                if (matcher.matches()) {
+                    passStrength = true;
+		}
+                
+                if(origPass.equals(confPass)){
+                    passMatch =true;
+                }
+                
+                if(!passStrength){
+                    JOptionPane.showMessageDialog(null, "Password must contain at least 1 lowercase letter\n"+
+                                                        "Password must contain at least 1 uppercase letter\n"+
+                                                        "Password must contain at least 1 number\n"+
+                                                        "Password must contain at least 1 special character\n", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                }
+                
+                if (!passMatch){
+                    JOptionPane.showMessageDialog(null, "Password does not match", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         }
     }//GEN-LAST:event_chgpassBtnActionPerformed
