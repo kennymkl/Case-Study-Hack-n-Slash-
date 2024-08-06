@@ -36,7 +36,7 @@ public class AdminHome extends javax.swing.JPanel {
     }
     
     public void init(SQLite sqlite, String username, int role){
-        mgmtHistory = new MgmtHistory(sqlite);
+        mgmtHistory = new MgmtHistory(sqlite, username, role);
         mgmtLogs = new MgmtLogs(sqlite);
         mgmtProduct = new MgmtProduct(sqlite, role);
         mgmtUser = new MgmtUser(sqlite);
@@ -202,22 +202,22 @@ public class AdminHome extends javax.swing.JPanel {
         contentView.show(Content, "mgmtLogs");
     }//GEN-LAST:event_logsBtnActionPerformed
     
-  private boolean checkSessionAndRedirect() {
-    if (!SessionManager.getInstance().isSessionValid()) {
-        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+    private boolean checkSessionAndRedirect() {
+        if (!SessionManager.getInstance().isSessionValid()) {
+            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 
-        if (topFrame instanceof Frame) {
-            Frame frame = (Frame) topFrame;
-            CardLayout cardLayout = frame.getFrameViewLayout();
-            cardLayout.show(frame.getContainerPanel(), "loginPnl");
-            return false;
-        } else {
-            System.err.println("Top Frame is not an instance of Frame");
-            return false;
+            if (topFrame instanceof Frame) {
+                Frame frame = (Frame) topFrame;
+                CardLayout cardLayout = frame.getFrameViewLayout();
+                cardLayout.show(frame.getContainerPanel(), "loginPnl");
+                return false;
+            } else {
+                System.err.println("Top Frame is not an instance of Frame");
+                return false;
+            }
         }
+        return true;
     }
-    return true;
-}
 
 
 

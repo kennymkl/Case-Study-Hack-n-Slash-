@@ -6,14 +6,18 @@
 package View;
 
 import Controller.SQLite;
+import Controller.SessionManager;
 import Model.History;
 import Model.Product;
+import java.awt.CardLayout;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern; 
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -23,10 +27,14 @@ public class MgmtHistory extends javax.swing.JPanel {
 
     public SQLite sqlite;
     public DefaultTableModel tableModel;
+    private int role;
+    private String username;
     
-    public MgmtHistory(SQLite sqlite) {
+    public MgmtHistory(SQLite sqlite, String username, int role) {
         initComponents();
         this.sqlite = sqlite;
+        this.role = role;
+        this.username = username;
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
         javax.swing.table.DefaultTableCellRenderer rightAlign = new javax.swing.table.DefaultTableCellRenderer();
@@ -48,17 +56,33 @@ public class MgmtHistory extends javax.swing.JPanel {
         }
         
 //      LOAD CONTENTS
-        ArrayList<History> history = sqlite.getHistory();
-        for(int nCtr = 0; nCtr < history.size(); nCtr++){
-            Product product = sqlite.getProduct(history.get(nCtr).getName());
-            tableModel.addRow(new Object[]{
-                history.get(nCtr).getUsername(), 
-                history.get(nCtr).getName(), 
-                history.get(nCtr).getStock(), 
-                product.getPrice(), 
-                product.getPrice() * history.get(nCtr).getStock(), 
-                history.get(nCtr).getTimestamp()
-            });
+        if (role==4) {
+            ArrayList<History> history = sqlite.getHistory();
+                for(int nCtr = 0; nCtr < history.size(); nCtr++){
+                    Product product = sqlite.getProduct(history.get(nCtr).getName());
+                    tableModel.addRow(new Object[]{
+                        history.get(nCtr).getUsername(), 
+                        history.get(nCtr).getName(), 
+                        history.get(nCtr).getStock(), 
+                        product.getPrice(), 
+                        product.getPrice() * history.get(nCtr).getStock(), 
+                        history.get(nCtr).getTimestamp()
+                    });
+                }
+        } else if (role==2) {
+            ArrayList<History> history = sqlite.getHistory();
+                for(int nCtr = 0; nCtr < history.size(); nCtr++){
+                    Product product = sqlite.getProduct(history.get(nCtr).getName());
+                    if (history.get(nCtr).getUsername().equals(username)) {
+                    tableModel.addRow(new Object[]{
+                        history.get(nCtr).getUsername(), 
+                        history.get(nCtr).getName(), 
+                        history.get(nCtr).getStock(), 
+                        product.getPrice(), 
+                        product.getPrice() * history.get(nCtr).getStock(), 
+                        history.get(nCtr).getTimestamp()
+                    });}
+                }
         }
     }
     
@@ -161,6 +185,8 @@ public class MgmtHistory extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
+        
         JTextField searchFld = new JTextField("0");
         designer(searchFld, "SEARCH USERNAME OR PRODUCT");
         
@@ -224,9 +250,28 @@ public class MgmtHistory extends javax.swing.JPanel {
     }//GEN-LAST:event_searchBtnActionPerformed
 
     private void reloadBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
+        
         init();
     }//GEN-LAST:event_reloadBtnActionPerformed
+    
+    
+    private boolean checkSessionAndRedirect() {
+        if (!SessionManager.getInstance().isSessionValid()) {
+            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 
+            if (topFrame instanceof Frame) {
+                Frame frame = (Frame) topFrame;
+                CardLayout cardLayout = frame.getFrameViewLayout();
+                cardLayout.show(frame.getContainerPanel(), "loginPnl");
+                return false;
+            } else {
+                System.err.println("Top Frame is not an instance of Frame");
+                return false;
+            }
+        }
+        return true;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;

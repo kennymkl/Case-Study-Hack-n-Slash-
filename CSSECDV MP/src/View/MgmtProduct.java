@@ -6,13 +6,17 @@
 package View;
 
 import Controller.SQLite;
+import Controller.SessionManager;
 import Model.Product;
+import java.awt.CardLayout;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -179,6 +183,8 @@ public class MgmtProduct extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void purchaseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_purchaseBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
+        
         if(table.getSelectedRow() >= 0){
             JTextField stockFld = new JTextField();
             designer(stockFld, "PRODUCT STOCK");
@@ -210,6 +216,8 @@ public class MgmtProduct extends javax.swing.JPanel {
     }//GEN-LAST:event_purchaseBtnActionPerformed
 
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
+        
         JTextField nameFld = new JTextField();
         JTextField stockFld = new JTextField();
         JTextField priceFld = new JTextField();
@@ -267,6 +275,8 @@ public class MgmtProduct extends javax.swing.JPanel {
     }//GEN-LAST:event_addBtnActionPerformed
 
     private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
+        
         if(table.getSelectedRow() >= 0){
             JTextField nameFld = new JTextField(tableModel.getValueAt(table.getSelectedRow(), 0) + "");
             JTextField stockFld = new JTextField(tableModel.getValueAt(table.getSelectedRow(), 1) + "");
@@ -325,6 +335,8 @@ public class MgmtProduct extends javax.swing.JPanel {
     }//GEN-LAST:event_editBtnActionPerformed
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
+        
         if(table.getSelectedRow() >= 0){
             int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE PRODUCT", JOptionPane.YES_NO_OPTION);
             
@@ -333,7 +345,23 @@ public class MgmtProduct extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_deleteBtnActionPerformed
+    
+    private boolean checkSessionAndRedirect() {
+        if (!SessionManager.getInstance().isSessionValid()) {
+            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 
+            if (topFrame instanceof Frame) {
+                Frame frame = (Frame) topFrame;
+                CardLayout cardLayout = frame.getFrameViewLayout();
+                cardLayout.show(frame.getContainerPanel(), "loginPnl");
+                return false;
+            } else {
+                System.err.println("Top Frame is not an instance of Frame");
+                return false;
+            }
+        }
+        return true;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addBtn;
