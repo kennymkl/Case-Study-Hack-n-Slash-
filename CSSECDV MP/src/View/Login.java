@@ -1,6 +1,7 @@
 
 package View;
 
+import Controller.SessionManager;
 import Controller.SQLite;
 import Model.LoginAttempts;
 import Model.User;

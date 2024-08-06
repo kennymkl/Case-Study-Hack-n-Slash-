@@ -1,5 +1,6 @@
 package View;
 
+import Controller.SessionManager;
 import Controller.Main;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
