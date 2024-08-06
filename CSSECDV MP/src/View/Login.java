@@ -30,6 +30,7 @@ import javax.mail.internet.*;
 public class Login extends javax.swing.JPanel {
 
     private String username;
+    private int role;
     
     public Frame frame;
     public SQLite sqlite;
@@ -70,6 +71,7 @@ public class Login extends javax.swing.JPanel {
             if (existingUsername.equals(inputUsername)){
                 validUser = true;
                 this.username = inputUsername;
+                this.role = users.get(nCtr).getRole();
             }
         }
         return validUser;
@@ -271,7 +273,7 @@ public class Login extends javax.swing.JPanel {
             System.out.println(numberOfAttempts);
             sqlite.deleteLoginAttempt(usernameFld.getText());
             clearFields();
-            frame.mainNav(username);
+            frame.mainNav(username, role);
         }
     }//GEN-LAST:event_loginBtnActionPerformed
     
@@ -304,7 +306,7 @@ public class Login extends javax.swing.JPanel {
                     sqlite.deleteLoginAttempt(usernameFld.getText());
                     clearFields();
                     System.out.println("this"+username);
-                    frame.mainNav(username);
+                    frame.mainNav(username, role);
                     
                 }
                 // if the account is invalid
