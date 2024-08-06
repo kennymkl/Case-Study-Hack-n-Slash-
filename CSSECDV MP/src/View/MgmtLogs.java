@@ -9,9 +9,7 @@ import Controller.SQLite;
 import Controller.SessionManager;
 import Model.Logs;
 import java.awt.CardLayout;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
@@ -24,10 +22,8 @@ public class MgmtLogs extends javax.swing.JPanel {
 
     public SQLite sqlite;
     public DefaultTableModel tableModel;
-    private String username;
     
-    public MgmtLogs(SQLite sqlite, String username) {
-        this.username = username;
+    public MgmtLogs(SQLite sqlite) {
         initComponents();
         this.sqlite = sqlite;
         tableModel = (DefaultTableModel)table.getModel();
@@ -144,8 +140,6 @@ public class MgmtLogs extends javax.swing.JPanel {
 
     private void clearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearBtnActionPerformed
         if (!checkSessionAndRedirect()) return;
-        sqlite.truncateLogs();
-        sqlite.addLogs("NOTICE", username, "Cleared logs", new Timestamp(new Date().getTime()).toString());
     }//GEN-LAST:event_clearBtnActionPerformed
 
     private void debugBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugBtnActionPerformed
