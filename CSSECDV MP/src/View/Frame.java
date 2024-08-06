@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 public class Frame extends javax.swing.JFrame {
     
     private String username;
+    private int role;
     
     public Frame() {
         initComponents();
@@ -250,10 +251,10 @@ public class Frame extends javax.swing.JFrame {
         loginPnl.frame = this;
         registerPnl.frame = this;
         
-        adminHomePnl.init(main.sqlite, username);
-        clientHomePnl.init(main.sqlite, username);
-        managerHomePnl.init(main.sqlite, username);
-        staffHomePnl.init(main.sqlite, username);
+//        adminHomePnl.init(main.sqlite, username, role);
+//        clientHomePnl.init(main.sqlite, username, role);
+//        managerHomePnl.init(main.sqlite, username, role);
+//        staffHomePnl.init(main.sqlite, username, role);
         
         Container.setLayout(frameView);
         Container.add(loginPnl, "loginPnl");
@@ -261,23 +262,61 @@ public class Frame extends javax.swing.JFrame {
         Container.add(HomePnl, "homePnl");
         frameView.show(Container, "loginPnl");
         
-        Content.setLayout(contentView);
-        Content.add(adminHomePnl, "adminHomePnl");
-        Content.add(managerHomePnl, "managerHomePnl");
-        Content.add(staffHomePnl, "staffHomePnl");
-        Content.add(clientHomePnl, "clientHomePnl");
+//        Content.setLayout(contentView);
+//        Content.add(adminHomePnl, "adminHomePnl");
+//        Content.add(managerHomePnl, "managerHomePnl");
+//        Content.add(staffHomePnl, "staffHomePnl");
+//        Content.add(clientHomePnl, "clientHomePnl");
         
         this.setVisible(true);
     }
     
-    public void mainNav(String username){
+    public void mainNav(String username, int role){
         this.username = username;
-        adminHomePnl.init(main.sqlite, username);
-        clientHomePnl.init(main.sqlite, username);
-        managerHomePnl.init(main.sqlite, username);
-        staffHomePnl.init(main.sqlite, username);
-        contentView.show(Content, "adminHomePnl");
-        frameView.show(Container, "homePnl");
+        this.role = role;
+
+        if (role==2){
+            clientHomePnl.init(main.sqlite, username, role);
+            clientHomePnl.showPnl("home");
+            Content.setLayout(contentView);
+            Content.add(clientHomePnl, "clientHomePnl");
+            contentView.show(Content, "clientHomePnl");
+            staffBtn.setVisible(false);
+            managerBtn.setVisible(false);
+            adminBtn.setVisible(false);
+            frameView.show(Container, "homePnl");
+        } else if (role==3) {
+            staffHomePnl.init(main.sqlite, username, role);
+            staffHomePnl.showPnl("home");
+            Content.setLayout(contentView);
+            Content.add(staffHomePnl, "staffHomePnl");
+            contentView.show(Content, "staffHomePnl");
+            clientBtn.setVisible(false);
+            managerBtn.setVisible(false);
+            adminBtn.setVisible(false);
+            frameView.show(Container, "homePnl");
+        } else if (role==4) {
+            managerHomePnl.init(main.sqlite, username, role);
+            managerHomePnl.showPnl("home");
+            Content.setLayout(contentView);
+            Content.add(clientHomePnl, "managerHomePnl");
+            contentView.show(Content, "managerHomePnl");
+            clientBtn.setVisible(false);
+            staffBtn.setVisible(false);
+            adminBtn.setVisible(false);
+            frameView.show(Container, "homePnl");
+        } else if (role==5) {
+            managerHomePnl.init(main.sqlite, username, role);
+            managerHomePnl.showPnl("home");
+            Content.setLayout(contentView);
+            Content.add(clientHomePnl, "managerHomePnl");
+            contentView.show(Content, "managerHomePnl");
+            clientBtn.setVisible(false);
+            staffBtn.setVisible(false);
+            managerBtn.setVisible(false);
+            frameView.show(Container, "homePnl");
+        }
+        
     }
     
     public void loginNav(){

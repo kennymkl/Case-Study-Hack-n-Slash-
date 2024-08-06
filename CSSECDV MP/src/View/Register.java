@@ -252,9 +252,10 @@ public class Register extends javax.swing.JPanel {
             // store to the database of the users
             try{
                 String hashedPassword = generateSHA256(originalPassword.toString()+"supersecuresaltsecdev6969");
-                frame.registerAction(usernameFld.getText(), hashedPassword, hashedPassword);
-                sqlite.addLogs("NOTICE", usernameFld.getText(), "User creation successful", new Timestamp(new Date().getTime()).toString());
+                frame.registerAction(usernameFld.getText().toLowerCase(), hashedPassword, hashedPassword);
+                sqlite.addLogs("NOTICE", usernameFld.getText().toLowerCase(), "User creation successful", new Timestamp(new Date().getTime()).toString());
                 System.out.println("ADDED USER: " + usernameFld.getText() + "\n" + originalPassword.toString() + "\n" + hashedPassword);
+                JOptionPane.showMessageDialog(null, "Account Created", "Account Created", JOptionPane.INFORMATION_MESSAGE);
                 frame.loginNav();
                 
             }catch (Exception e) {
