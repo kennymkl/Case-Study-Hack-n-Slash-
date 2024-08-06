@@ -271,6 +271,9 @@ public class Login extends javax.swing.JPanel {
             System.out.println(numberOfAttempts);
             sqlite.deleteLoginAttempt(usernameFld.getText());
             clearFields();
+            
+            SessionManager.getInstance().startSession(username);
+            
             frame.mainNav(username);
         }
     }//GEN-LAST:event_loginBtnActionPerformed

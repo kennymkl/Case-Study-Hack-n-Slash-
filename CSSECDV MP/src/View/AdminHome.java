@@ -6,6 +6,7 @@
 package View;
 //[255,102,51]
 import Controller.SQLite;
+import javax.swing.JFrame; // Import JFrame instead of Frame
 import Model.History;
 import Model.Logs;
 import Model.Product;
@@ -29,7 +30,7 @@ public class AdminHome extends javax.swing.JPanel {
     private CardLayout contentView = new CardLayout();
     
     public AdminHome() {
-        initComponents();
+        initComponents();   
     }
     
     public void init(SQLite sqlite, String username){
@@ -165,7 +166,7 @@ public class AdminHome extends javax.swing.JPanel {
         productsBtn.setForeground(Color.black);
         historyBtn.setForeground(Color.black);
         logsBtn.setForeground(Color.black);
-        contentView.show(Content, "mgmtUser");
+        contentView.show(Content, "mgmtUser");        
     }//GEN-LAST:event_usersBtnActionPerformed
 
     private void productsBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productsBtnActionPerformed

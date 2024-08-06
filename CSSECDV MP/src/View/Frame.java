@@ -182,26 +182,48 @@ public class Frame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void adminBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminBtnActionPerformed
+        if(!SessionManager.getInstance().isSessionValid()){
+            frameView.show(Container, "loginPnl");
+            return;
+            
+        } 
+        
         adminHomePnl.showPnl("home");
         contentView.show(Content, "adminHomePnl");
     }//GEN-LAST:event_adminBtnActionPerformed
 
     private void managerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_managerBtnActionPerformed
+        if(!SessionManager.getInstance().isSessionValid()){
+            frameView.show(Container, "loginPnl");
+            return;
+        }
+        
         managerHomePnl.showPnl("home");
         contentView.show(Content, "managerHomePnl");
     }//GEN-LAST:event_managerBtnActionPerformed
 
     private void staffBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_staffBtnActionPerformed
+        if(!SessionManager.getInstance().isSessionValid()){
+            frameView.show(Container, "loginPnl");
+            return;
+        }
+        
         staffHomePnl.showPnl("home");
         contentView.show(Content, "staffHomePnl");
     }//GEN-LAST:event_staffBtnActionPerformed
 
     private void clientBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientBtnActionPerformed
+        if(!SessionManager.getInstance().isSessionValid()){
+            frameView.show(Container, "loginPnl");
+            return;
+        }
+        
         clientHomePnl.showPnl("home");
         contentView.show(Content, "clientHomePnl");
     }//GEN-LAST:event_clientBtnActionPerformed
 
     private void logoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutBtnActionPerformed
+        SessionManager.getInstance().invalidateSession();
         frameView.show(Container, "loginPnl");
     }//GEN-LAST:event_logoutBtnActionPerformed
 
@@ -267,6 +289,16 @@ public class Frame extends javax.swing.JFrame {
     public void registerAction(String username, String password, String confpass){
         main.sqlite.addUser(username, password);
     }
+    
+    // Method to check session validity
+    private boolean isSessionValid() {
+        if (!SessionManager.getInstance().isSessionValid()) {
+            frameView.show(Container, "loginPnl"); // Redirect to login page
+            return false;
+        }
+        return true;
+    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Container;
