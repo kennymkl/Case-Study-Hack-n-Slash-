@@ -33,7 +33,7 @@ public class AdminHome extends javax.swing.JPanel {
     }
     
     public void init(SQLite sqlite, String username, int role){
-        mgmtHistory = new MgmtHistory(sqlite);
+        mgmtHistory = new MgmtHistory(sqlite, username, role);
         mgmtLogs = new MgmtLogs(sqlite);
         mgmtProduct = new MgmtProduct(sqlite, role);
         mgmtUser = new MgmtUser(sqlite);

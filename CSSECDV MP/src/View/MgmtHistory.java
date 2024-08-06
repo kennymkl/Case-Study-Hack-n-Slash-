@@ -23,10 +23,14 @@ public class MgmtHistory extends javax.swing.JPanel {
 
     public SQLite sqlite;
     public DefaultTableModel tableModel;
+    private int role;
+    private String username;
     
-    public MgmtHistory(SQLite sqlite) {
+    public MgmtHistory(SQLite sqlite, String username, int role) {
         initComponents();
         this.sqlite = sqlite;
+        this.role = role;
+        this.username = username;
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
         javax.swing.table.DefaultTableCellRenderer rightAlign = new javax.swing.table.DefaultTableCellRenderer();
@@ -48,17 +52,33 @@ public class MgmtHistory extends javax.swing.JPanel {
         }
         
 //      LOAD CONTENTS
-        ArrayList<History> history = sqlite.getHistory();
-        for(int nCtr = 0; nCtr < history.size(); nCtr++){
-            Product product = sqlite.getProduct(history.get(nCtr).getName());
-            tableModel.addRow(new Object[]{
-                history.get(nCtr).getUsername(), 
-                history.get(nCtr).getName(), 
-                history.get(nCtr).getStock(), 
-                product.getPrice(), 
-                product.getPrice() * history.get(nCtr).getStock(), 
-                history.get(nCtr).getTimestamp()
-            });
+        if (role==4) {
+            ArrayList<History> history = sqlite.getHistory();
+                for(int nCtr = 0; nCtr < history.size(); nCtr++){
+                    Product product = sqlite.getProduct(history.get(nCtr).getName());
+                    tableModel.addRow(new Object[]{
+                        history.get(nCtr).getUsername(), 
+                        history.get(nCtr).getName(), 
+                        history.get(nCtr).getStock(), 
+                        product.getPrice(), 
+                        product.getPrice() * history.get(nCtr).getStock(), 
+                        history.get(nCtr).getTimestamp()
+                    });
+                }
+        } else if (role==2) {
+            ArrayList<History> history = sqlite.getHistory();
+                for(int nCtr = 0; nCtr < history.size(); nCtr++){
+                    Product product = sqlite.getProduct(history.get(nCtr).getName());
+                    if (history.get(nCtr).getUsername().equals(username)) {
+                    tableModel.addRow(new Object[]{
+                        history.get(nCtr).getUsername(), 
+                        history.get(nCtr).getName(), 
+                        history.get(nCtr).getStock(), 
+                        product.getPrice(), 
+                        product.getPrice() * history.get(nCtr).getStock(), 
+                        history.get(nCtr).getTimestamp()
+                    });}
+                }
         }
     }
     
