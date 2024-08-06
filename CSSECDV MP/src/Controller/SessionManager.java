@@ -17,7 +17,7 @@ public class SessionManager {
     private String loggedInUser;
     private Timer sessionTimer;
 //    private final int SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
-     private final int SESSION_TIMEOUT = 5 * 1000; // for testing 5 second session
+     private final int SESSION_TIMEOUT = 30 * 60 * 1000; // for testing 5 second session
 
     private SessionManager() {
         // Private constructor to prevent instantiation

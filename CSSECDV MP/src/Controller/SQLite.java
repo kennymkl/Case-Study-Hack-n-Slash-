@@ -146,6 +146,18 @@ public class SQLite {
         }
     }
     
+    public void truncateLogs() {
+        String sql = "DELETE FROM logs;";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Table logs in database.db truncated.");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
     public void dropProductTable() {
         String sql = "DROP TABLE IF EXISTS product;";
 
@@ -458,6 +470,21 @@ public class SQLite {
             } else {
                 System.out.println("No account found with the specified username.");
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public void updateRole(String username, int role) {
+        String sql = "UPDATE users SET role = ? WHERE username = ?";
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, role);
+            pstmt.setString(2, username);
+            pstmt.executeUpdate();
+            
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
