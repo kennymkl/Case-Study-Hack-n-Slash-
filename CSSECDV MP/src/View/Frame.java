@@ -323,6 +323,7 @@ public class Frame extends javax.swing.JFrame {
         }
         
     }
+
     
     public void loginNav(){
         frameView.show(Container, "loginPnl");
