@@ -250,13 +250,15 @@ public class Frame extends javax.swing.JFrame {
     public void mainNav(String username, int role){
         this.username = username;
         this.role = role;
+        System.out.println("this"+role);
 
-        if (role==2){
+        if (role==2) {
             clientHomePnl.init(main.sqlite, username, role);
             clientHomePnl.showPnl("home");
             Content.setLayout(contentView);
             Content.add(clientHomePnl, "clientHomePnl");
             contentView.show(Content, "clientHomePnl");
+            clientBtn.setVisible(true);
             staffBtn.setVisible(false);
             managerBtn.setVisible(false);
             adminBtn.setVisible(false);
@@ -268,6 +270,7 @@ public class Frame extends javax.swing.JFrame {
             Content.add(staffHomePnl, "staffHomePnl");
             contentView.show(Content, "staffHomePnl");
             clientBtn.setVisible(false);
+            staffBtn.setVisible(true);
             managerBtn.setVisible(false);
             adminBtn.setVisible(false);
             frameView.show(Container, "homePnl");
@@ -275,21 +278,23 @@ public class Frame extends javax.swing.JFrame {
             managerHomePnl.init(main.sqlite, username, role);
             managerHomePnl.showPnl("home");
             Content.setLayout(contentView);
-            Content.add(clientHomePnl, "managerHomePnl");
+            Content.add(managerHomePnl, "managerHomePnl");
             contentView.show(Content, "managerHomePnl");
             clientBtn.setVisible(false);
             staffBtn.setVisible(false);
+            managerBtn.setVisible(true);
             adminBtn.setVisible(false);
             frameView.show(Container, "homePnl");
         } else if (role==5) {
-            managerHomePnl.init(main.sqlite, username, role);
-            managerHomePnl.showPnl("home");
+            adminHomePnl.init(main.sqlite, username, role);
+            adminHomePnl.showPnl("home");
             Content.setLayout(contentView);
-            Content.add(clientHomePnl, "managerHomePnl");
-            contentView.show(Content, "managerHomePnl");
+            Content.add(adminHomePnl, "adminHomePnl");
+            contentView.show(Content, "adminHomePnl");
             clientBtn.setVisible(false);
             staffBtn.setVisible(false);
             managerBtn.setVisible(false);
+            adminBtn.setVisible(true);
             frameView.show(Container, "homePnl");
         }
         
