@@ -231,26 +231,14 @@ public class MgmtHistory extends javax.swing.JPanel {
                        history.get(nCtr).getName().contains(searchFld.getText())){
 
                         Product product = sqlite.getProduct(history.get(nCtr).getName());
-                        if(role == 4){
-                             tableModel.addRow(new Object[]{
-                                history.get(nCtr).getUsername(), 
-                                history.get(nCtr).getName(), 
-                                history.get(nCtr).getStock(), 
-                                product.getPrice(), 
-                                product.getPrice() * history.get(nCtr).getStock(), 
-                                history.get(nCtr).getTimestamp()
-                            });
-                         }
-                        else if (history.get(nCtr).getUsername().equals(username)) {
-                            tableModel.addRow(new Object[]{
-                                history.get(nCtr).getUsername(), 
-                                history.get(nCtr).getName(), 
-                                history.get(nCtr).getStock(), 
-                                product.getPrice(), 
-                                product.getPrice() * history.get(nCtr).getStock(), 
-                                history.get(nCtr).getTimestamp()
-                            });
-                        }
+                        tableModel.addRow(new Object[]{
+                            history.get(nCtr).getUsername(), 
+                            history.get(nCtr).getName(), 
+                            history.get(nCtr).getStock(), 
+                            product.getPrice(), 
+                            product.getPrice() * history.get(nCtr).getStock(), 
+                            history.get(nCtr).getTimestamp()
+                        });
                     }
                 }
             }else{
