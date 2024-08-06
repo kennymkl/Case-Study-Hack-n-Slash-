@@ -221,7 +221,7 @@ public class MgmtProduct extends javax.swing.JPanel {
                             sqlite.updateProductStock(product.getName(), updatedStocks);
                             sqlite.addHistory(username, product.getName(), numStock, new Timestamp(new Date().getTime()).toString());
                             // reload the contents
-                            reloadTableContents();
+//                            reloadTableContents();
                             
                             
                             
