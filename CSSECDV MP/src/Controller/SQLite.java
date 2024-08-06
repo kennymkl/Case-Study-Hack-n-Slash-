@@ -252,6 +252,29 @@ public class SQLite {
         return histories;
     }
     
+    public ArrayList<History> getHistoryByUser(String username) {
+        String sql = "SELECT id, username, name, stock, timestamp FROM history WHERE username = ?";
+        ArrayList<History> histories = new ArrayList<History>();
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    histories.add(new History(rs.getInt("id"),
+                                              rs.getString("username"),
+                                              rs.getString("name"),
+                                              rs.getInt("stock"),
+                                              rs.getString("timestamp")));
+                }
+            }
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return histories;
+    }
+
     public ArrayList<Logs> getLogs(){
         String sql = "SELECT id, event, username, desc, timestamp FROM logs";
         ArrayList<Logs> logs = new ArrayList<Logs>();
@@ -293,6 +316,47 @@ public class SQLite {
         return products;
     }
     
+    public boolean updateProduct(String previousName, String newName, double price, int stock) {
+        String sql = "UPDATE product SET name = ?, price = ?, stock = ? WHERE name = ?";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, newName);
+            pstmt.setDouble(2, price);
+            pstmt.setInt(3, stock);
+            pstmt.setString(4, previousName);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0; // Return true if update was successful
+        } catch (Exception ex) {
+            System.out.print(ex);
+            return false;
+        }
+    }
+    
+        // update the product stock
+    public boolean updateProductStock(String productName, int newStock) {
+        String sql = "UPDATE product SET stock = ? WHERE name = ?";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("INSIDE SQL");
+            System.out.println(productName);
+            System.out.println(newStock);
+            
+            
+            pstmt.setInt(1, newStock);
+            pstmt.setString(2, productName);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0; // Return true if update was successful
+        } catch (Exception ex) {
+            System.out.print(ex);
+            return false;
+        }
+    }
+
     public ArrayList<User> getUsers(){
         String sql = "SELECT id, username, password, role, locked FROM users";
         ArrayList<User> users = new ArrayList<User>();
@@ -399,6 +463,22 @@ public class SQLite {
         return product;
     }
     
+    public boolean deleteProductByName(String name) {
+        String sql = "DELETE FROM product WHERE name = ?";
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, name);
+
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0; // Return true if delete was successful
+        } catch (Exception ex) {
+            System.out.print(ex);
+            return false;
+        }
+    }
+
     public void updateLockAccountStatus(String username, int status){
         String sql = "UPDATE users SET locked = ? WHERE username = ?";
            
