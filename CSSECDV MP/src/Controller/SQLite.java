@@ -17,6 +17,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 
 public class SQLite {
@@ -203,6 +205,40 @@ public class SQLite {
             System.out.print(ex);
         }
     }
+   public void updateLogEntry(String timestamp, String newEvent, String newDesc) {
+    // SQL statement to update the log entry with the given timestamp
+        String sql = "UPDATE logs SET event = ?, desc = ? WHERE timestamp = ?";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); // Adjust format as needed
+
+        try {
+            // Parse the string timestamp to java.sql.Timestamp
+            java.util.Date parsedDate = dateFormat.parse(timestamp);
+            Timestamp timestampstr = new Timestamp(parsedDate.getTime());
+            System.out.println("Formatted Timestamp: " + timestampstr + " inside db");
+
+            try (Connection conn = DriverManager.getConnection(driverURL);
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                // Set the parameters for the SQL query
+                pstmt.setString(1, newEvent);
+                pstmt.setString(2, newDesc);
+                pstmt.setString(3, timestamp); // Use Timestamp object
+
+           
+                // Execute the update statement
+                int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Log entry updated successfully.");
+                } else {
+                    System.out.println("No log entry found with the given timestamp.");
+                }
+            }
+        } catch (Exception ex) {
+            // Print stack trace for better debugging
+            ex.printStackTrace();
+        }
+    }
+
     
     public void addProduct(String name, int stock, double price) {
         String sql = "INSERT INTO product(name,stock,price) VALUES('" + name + "','" + stock + "','" + price + "')";
