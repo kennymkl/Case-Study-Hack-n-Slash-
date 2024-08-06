@@ -6,6 +6,7 @@
 package View;
 //[255,102,51]
 import Controller.SQLite;
+import Controller.SessionManager;
 import Model.History;
 import Model.Logs;
 import Model.Product;
@@ -13,6 +14,8 @@ import Model.User;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.util.ArrayList;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -156,6 +159,7 @@ public class ClientHome extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void usersBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usersBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
         mgmtUser.init();
         usersBtn.setForeground(Color.red);
         productsBtn.setForeground(Color.black);
@@ -165,6 +169,7 @@ public class ClientHome extends javax.swing.JPanel {
     }//GEN-LAST:event_usersBtnActionPerformed
 
     private void productsBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productsBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
         mgmtProduct.init();
         usersBtn.setForeground(Color.black);
         productsBtn.setForeground(Color.red);
@@ -174,6 +179,7 @@ public class ClientHome extends javax.swing.JPanel {
     }//GEN-LAST:event_productsBtnActionPerformed
 
     private void historyBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historyBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
         mgmtHistory.init();
         usersBtn.setForeground(Color.black);
         productsBtn.setForeground(Color.black);
@@ -183,6 +189,7 @@ public class ClientHome extends javax.swing.JPanel {
     }//GEN-LAST:event_historyBtnActionPerformed
 
     private void logsBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logsBtnActionPerformed
+        if (!checkSessionAndRedirect()) return;
         mgmtLogs.init();
         usersBtn.setForeground(Color.black);
         productsBtn.setForeground(Color.black);
@@ -190,7 +197,23 @@ public class ClientHome extends javax.swing.JPanel {
         logsBtn.setForeground(Color.red);
         contentView.show(Content, "mgmtLogs");
     }//GEN-LAST:event_logsBtnActionPerformed
-    
+
+  private boolean checkSessionAndRedirect() {
+    if (!SessionManager.getInstance().isSessionValid()) {
+        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+        if (topFrame instanceof Frame) {
+            Frame frame = (Frame) topFrame;
+            CardLayout cardLayout = frame.getFrameViewLayout();
+            cardLayout.show(frame.getContainerPanel(), "loginPnl");
+            return false;
+        } else {
+            System.err.println("Top Frame is not an instance of Frame");
+            return false;
+        }
+    }
+    return true;
+}    
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
