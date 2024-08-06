@@ -227,7 +227,7 @@ public class Login extends javax.swing.JPanel {
             clearFields();
         }
         else if(accountLocked == 1 && (!validUsername || !validPassword)){
-            JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "The account is locked. Please contact admin", "Account Status", JOptionPane.INFORMATION_MESSAGE);
             clearFields();
         }
         // if the account is not locked and the number of login attempts is less than max login attempts, increment it.
@@ -248,6 +248,9 @@ public class Login extends javax.swing.JPanel {
                 cal.setTime(new Date());
                 cal.add(Calendar.MINUTE, 15); 
                 Timestamp newTimestamp = new Timestamp(cal.getTime().getTime());
+                 sqlite.updateLockAccountStatus(usernameFld.getText().toLowerCase(),1);
+                sqlite.addLogs("WARNING", usernameFld.getText().toLowerCase(),"This account has been locked due to excessive attempts", new Timestamp(new Date().getTime()).toString());
+                sqlite.deleteLoginAttempt(usernameFld.getText().toLowerCase());
                 // Update the database with the new timestamp
                 sqlite.updateLoginAttempts(usernameFld.getText(), newTimestamp.toString());
                 
@@ -257,8 +260,11 @@ public class Login extends javax.swing.JPanel {
         // if the account is locked and reached the number of maximum attempts prompt the user for 2 minutes
         // if the 2 minutes is done, delete the record from the database
         else if (validUsername && !validPassword && numberOfAttempts >= maxLoginAttempts && accountLocked == 0){
-            
-            accountLockedDueToExcessAttempts();
+            sqlite.updateLockAccountStatus(usernameFld.getText().toLowerCase(),1);
+            sqlite.addLogs("WARNING", usernameFld.getText().toLowerCase(),"This account has been locked due to excessive attempts", new Timestamp(new Date().getTime()).toString());
+            sqlite.deleteLoginAttempt(usernameFld.getText().toLowerCase());
+            JOptionPane.showMessageDialog(frame, "The account is locked. Please Contact Admin", " Locked Account", JOptionPane.INFORMATION_MESSAGE);
+            //accountLockedDueToExcessAttempts();
             clearFields();  
         }
         else if (!validUsername || !validPassword && accountLocked == 0){
@@ -266,9 +272,12 @@ public class Login extends javax.swing.JPanel {
             clearFields();
         }
         
-        else if (numberOfAttempts >= maxLoginAttempts){
-            accountLockedDueToExcessAttempts();
-        }
+//        else if (numberOfAttempts > maxLoginAttempts){
+//            sqlite.addLogs("WARNING", usernameFld.getText().toLowerCase(),"This account has been locked due to excessive attempts", new Timestamp(new Date().getTime()).toString());
+//            sqlite.deleteLoginAttempt(usernameFld.getText().toLowerCase());
+//            JOptionPane.showMessageDialog(frame, "The account is locked. Please Contact Admin", " Locked Account", JOptionPane.INFORMATION_MESSAGE);
+//            //accountLockedDueToExcessAttempts();
+//        }
         else if (validUsername && validPassword && accountLocked ==0 && numberOfAttempts < maxLoginAttempts){
             // delete the record in the login attempt
             System.out.println(numberOfAttempts);
