@@ -6,6 +6,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import javax.swing.WindowConstants;
+import javax.swing.JPanel;
 
 public class Frame extends javax.swing.JFrame {
     
@@ -299,6 +300,15 @@ public class Frame extends javax.swing.JFrame {
         }
         return true;
     }
+    
+    public CardLayout getFrameViewLayout() {
+    return frameView;
+}
+
+public JPanel getContainerPanel() {
+    return Container;
+}
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
