@@ -208,6 +208,8 @@ public class MgmtUser extends javax.swing.JPanel {
                 sqlite.addLogs("NOTICE", username, "Role updated: " + (String) tableModel.getValueAt(table.getSelectedRow(), 0), new Timestamp(new Date().getTime()).toString());
             }
         }
+        
+        init();
     }//GEN-LAST:event_editRoleBtnActionPerformed
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
@@ -221,6 +223,7 @@ public class MgmtUser extends javax.swing.JPanel {
                 sqlite.removeUser((String) tableModel.getValueAt(table.getSelectedRow(), 0));
             }
         }
+        init();
     }//GEN-LAST:event_deleteBtnActionPerformed
 
     private void lockBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lockBtnActionPerformed
@@ -249,11 +252,9 @@ public class MgmtUser extends javax.swing.JPanel {
                     sqlite.updateLockAccountStatus(accountName,0);
                     sqlite.addLogs("NOTICE", username,"Account unlocked: "+ accountName, new Timestamp(new Date().getTime()).toString());
                 }
-     
-               
-                
             }
         }
+        init();
     }//GEN-LAST:event_lockBtnActionPerformed
 
     private void chgpassBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chgpassBtnActionPerformed
@@ -312,6 +313,7 @@ public class MgmtUser extends javax.swing.JPanel {
                 }
             }
         }
+        init();
     }//GEN-LAST:event_chgpassBtnActionPerformed
     
     private boolean checkSessionAndRedirect() {

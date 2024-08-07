@@ -149,6 +149,7 @@ public class MgmtLogs extends javax.swing.JPanel {
         if (!checkSessionAndRedirect()) return;
         sqlite.truncateLogs();
         sqlite.addLogs("NOTICE", username, "Cleared logs", new Timestamp(new Date().getTime()).toString());
+        init();
     }//GEN-LAST:event_clearBtnActionPerformed
 
     private void debugBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugBtnActionPerformed
@@ -232,6 +233,7 @@ public class MgmtLogs extends javax.swing.JPanel {
             sqlite.DEBUG_MODE = 0;
         // debug here
         }
+        init();
     }//GEN-LAST:event_debugBtnActionPerformed
     private boolean isValidInput(String input) {
          // Regex pattern to match 1-100 characters, consisting of letters and numbers

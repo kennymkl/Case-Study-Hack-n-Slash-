@@ -220,12 +220,6 @@ public class MgmtProduct extends javax.swing.JPanel {
                             System.out.println(updatedStocks);
                             sqlite.updateProductStock(product.getName(), updatedStocks);
                             sqlite.addHistory(username, product.getName(), numStock, new Timestamp(new Date().getTime()).toString());
-                            // reload the contents
-//                            reloadTableContents();
-                            
-                            
-                            
-                            
                         } else if (numStock <= 0) {
                             JOptionPane.showMessageDialog(null, "You must purchase at least one item. Please enter a valid quantity.", "Warning", JOptionPane.INFORMATION_MESSAGE);
                         } else if (numStock > numberAvail) {
@@ -239,6 +233,7 @@ public class MgmtProduct extends javax.swing.JPanel {
             }
             }
         }
+        init();
     }//GEN-LAST:event_purchaseBtnActionPerformed
 
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
@@ -318,8 +313,8 @@ public class MgmtProduct extends javax.swing.JPanel {
                 // show success message
                 JOptionPane.showMessageDialog(null, "Product Added", "Product Added", JOptionPane.INFORMATION_MESSAGE);
             }
-            
         }
+        init();
     }//GEN-LAST:event_addBtnActionPerformed
 
     private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
@@ -408,8 +403,8 @@ public class MgmtProduct extends javax.swing.JPanel {
                 System.out.println("Previous name " + currentName);
                 System.out.println("Current name " + prodName);
             }
-
         }
+        init();
     }//GEN-LAST:event_editBtnActionPerformed
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
@@ -425,6 +420,7 @@ public class MgmtProduct extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(null, "Product Deleted", "Product Deleted", JOptionPane.INFORMATION_MESSAGE);
             }
         }
+        init();
     }//GEN-LAST:event_deleteBtnActionPerformed
     
     private boolean checkSessionAndRedirect() {
