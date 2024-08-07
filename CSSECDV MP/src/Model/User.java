@@ -10,7 +10,6 @@ public class User {
     public User(String username, String password){
         this.username = username;
         this.password = password;
-
     }
     
     public User(int id, String username, String password, int role, int locked){

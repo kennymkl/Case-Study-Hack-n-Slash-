@@ -188,9 +188,7 @@ public class Frame extends javax.swing.JFrame {
         if(!SessionManager.getInstance().isSessionValid()){
             frameView.show(Container, "loginPnl");
             return;
-            
         } 
-        
         adminHomePnl.showPnl("home");
         contentView.show(Content, "adminHomePnl");
     }//GEN-LAST:event_adminBtnActionPerformed
@@ -200,7 +198,6 @@ public class Frame extends javax.swing.JFrame {
             frameView.show(Container, "loginPnl");
             return;
         }
-        
         managerHomePnl.showPnl("home");
         contentView.show(Content, "managerHomePnl");
     }//GEN-LAST:event_managerBtnActionPerformed
@@ -210,7 +207,6 @@ public class Frame extends javax.swing.JFrame {
             frameView.show(Container, "loginPnl");
             return;
         }
-        
         staffHomePnl.showPnl("home");
         contentView.show(Content, "staffHomePnl");
     }//GEN-LAST:event_staffBtnActionPerformed
@@ -220,7 +216,6 @@ public class Frame extends javax.swing.JFrame {
             frameView.show(Container, "loginPnl");
             return;
         }
-        
         clientHomePnl.showPnl("home");
         contentView.show(Content, "clientHomePnl");
     }//GEN-LAST:event_clientBtnActionPerformed
@@ -251,22 +246,11 @@ public class Frame extends javax.swing.JFrame {
         loginPnl.frame = this;
         registerPnl.frame = this;
         
-//        adminHomePnl.init(main.sqlite, username, role);
-//        clientHomePnl.init(main.sqlite, username, role);
-//        managerHomePnl.init(main.sqlite, username, role);
-//        staffHomePnl.init(main.sqlite, username, role);
-        
         Container.setLayout(frameView);
         Container.add(loginPnl, "loginPnl");
         Container.add(registerPnl, "registerPnl");
         Container.add(HomePnl, "homePnl");
         frameView.show(Container, "loginPnl");
-        
-//        Content.setLayout(contentView);
-//        Content.add(adminHomePnl, "adminHomePnl");
-//        Content.add(managerHomePnl, "managerHomePnl");
-//        Content.add(staffHomePnl, "staffHomePnl");
-//        Content.add(clientHomePnl, "clientHomePnl");
         
         this.setVisible(true);
     }
@@ -321,7 +305,6 @@ public class Frame extends javax.swing.JFrame {
             adminBtn.setVisible(true);
             frameView.show(Container, "homePnl");
         }
-        
     }
     
     public void loginNav(){
@@ -336,7 +319,6 @@ public class Frame extends javax.swing.JFrame {
         main.sqlite.addUser(username, password);
     }
     
-    // Method to check session validity
     private boolean isSessionValid() {
         if (!SessionManager.getInstance().isSessionValid()) {
             frameView.show(Container, "loginPnl"); // Redirect to login page
@@ -346,14 +328,12 @@ public class Frame extends javax.swing.JFrame {
     }
     
     public CardLayout getFrameViewLayout() {
-    return frameView;
-}
+        return frameView;
+    }
 
-public JPanel getContainerPanel() {
-    return Container;
-}
-
-    
+    public JPanel getContainerPanel() {
+        return Container;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Container;

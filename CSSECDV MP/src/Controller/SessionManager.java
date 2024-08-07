@@ -16,11 +16,9 @@ public class SessionManager {
     private static SessionManager instance;
     private String loggedInUser;
     private Timer sessionTimer;
-//    private final int SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
-     private final int SESSION_TIMEOUT = 30 * 60 * 1000; // for testing 5 second session
+    private final int SESSION_TIMEOUT = 30 * 60 * 1000;
 
     private SessionManager() {
-        // Private constructor to prevent instantiation
     }
 
     public static SessionManager getInstance() {
@@ -57,7 +55,6 @@ public class SessionManager {
             sessionTimer.cancel();
         }
         JOptionPane.showMessageDialog(null, "Session has expired. You will be redirected to the login page after an action is performed. Please log in again.", "Session Timeout", JOptionPane.INFORMATION_MESSAGE);
-        // You can add additional actions here, such as redirecting to the login screen
     }
 
     public boolean isSessionValid() {
@@ -71,4 +68,5 @@ public class SessionManager {
     public void resetSessionTimer() {
         startSessionTimer();
     }
+    
 }

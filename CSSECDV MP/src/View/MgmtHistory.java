@@ -187,7 +187,7 @@ public class MgmtHistory extends javax.swing.JPanel {
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtnActionPerformed
         if (!checkSessionAndRedirect()) return;
         
-        JTextField searchFld = new JTextField("0");
+        JTextField searchFld = new JTextField(null);
         designer(searchFld, "SEARCH USERNAME OR PRODUCT");
         
         //check if user input for search for users is valid

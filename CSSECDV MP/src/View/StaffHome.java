@@ -48,10 +48,8 @@ public class StaffHome extends javax.swing.JPanel {
         Content.add(mgmtProduct, "mgmtProduct");
         Content.add(mgmtLogs, "mgmtLogs");
         
-//        UNCOMMENT TO DISABLE BUTTONS
         historyBtn.setVisible(false);
         usersBtn.setVisible(false);
-//        productsBtn.setVisible(false);
         logsBtn.setVisible(false);
     }
     
@@ -197,23 +195,23 @@ public class StaffHome extends javax.swing.JPanel {
         logsBtn.setForeground(Color.red);
         contentView.show(Content, "mgmtLogs");
     }//GEN-LAST:event_logsBtnActionPerformed
-    private boolean checkSessionAndRedirect() {
-    if (!SessionManager.getInstance().isSessionValid()) {
-        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-
-        if (topFrame instanceof Frame) {
-            Frame frame = (Frame) topFrame;
-            CardLayout cardLayout = frame.getFrameViewLayout();
-            cardLayout.show(frame.getContainerPanel(), "loginPnl");
-            return false;
-        } else {
-            System.err.println("Top Frame is not an instance of Frame");
-            return false;
-        }
-    }
-    return true;
-}
     
+    private boolean checkSessionAndRedirect() {
+        if (!SessionManager.getInstance().isSessionValid()) {
+            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+            if (topFrame instanceof Frame) {
+                Frame frame = (Frame) topFrame;
+                CardLayout cardLayout = frame.getFrameViewLayout();
+                cardLayout.show(frame.getContainerPanel(), "loginPnl");
+                return false;
+            } else {
+                System.err.println("Top Frame is not an instance of Frame");
+                return false;
+            }
+        }
+        return true;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Content;

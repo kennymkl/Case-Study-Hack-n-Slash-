@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package View;
-//[255,102,51]
+
 import Controller.SQLite;
 import Controller.SessionManager;
 import Model.History;
@@ -47,11 +47,8 @@ public class ClientHome extends javax.swing.JPanel {
         Content.add(mgmtHistory, "mgmtHistory");
         Content.add(mgmtProduct, "mgmtProduct");
         Content.add(mgmtLogs, "mgmtLogs");
-        
-//        UNCOMMENT TO DISABLE BUTTONS
-//        historyBtn.setVisible(false);
+
         usersBtn.setVisible(false);
-//        productsBtn.setVisible(false);
         logsBtn.setVisible(false);
     }
     
@@ -214,7 +211,6 @@ public class ClientHome extends javax.swing.JPanel {
     }
     return true;
 }    
-    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Content;

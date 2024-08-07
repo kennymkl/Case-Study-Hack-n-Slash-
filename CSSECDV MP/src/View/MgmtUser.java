@@ -43,21 +43,13 @@ public class MgmtUser extends javax.swing.JPanel {
         this.sqlite = sqlite;
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
-        
-//        UNCOMMENT TO DISABLE BUTTONS
-//        editBtn.setVisible(false);
-//        deleteBtn.setVisible(false);
-//        lockBtn.setVisible(false);
-//        chgpassBtn.setVisible(false);
     }
     
     public void init(){
-        //      CLEAR TABLE
         for(int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--){
             tableModel.removeRow(0);
         }
         
-//      LOAD CONTENTS
         ArrayList<User> users = sqlite.getUsers();
         for(int nCtr = 0; nCtr < users.size(); nCtr++){
             tableModel.addRow(new Object[]{
@@ -208,7 +200,6 @@ public class MgmtUser extends javax.swing.JPanel {
                 sqlite.addLogs("NOTICE", username, "Role updated: " + (String) tableModel.getValueAt(table.getSelectedRow(), 0), new Timestamp(new Date().getTime()).toString());
             }
         }
-        
         init();
     }//GEN-LAST:event_editRoleBtnActionPerformed
 
@@ -239,15 +230,15 @@ public class MgmtUser extends javax.swing.JPanel {
             int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to " + state + " " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
             
             if (result == JOptionPane.YES_OPTION) {
-                //System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
                 String accountName = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
                 String accountStatus = tableModel.getValueAt(table.getSelectedRow(), 3).toString();
-                if(accountStatus.equals("0")){
+                if (accountStatus.equals("0")) {
                     System.out.println("LOCK THIS ACCOUNT");
                      sqlite.updateLockAccountStatus(accountName,1);
                      sqlite.addLogs("NOTICE", username,"Account locked: " + accountName, new Timestamp(new Date().getTime()).toString());
                 }
-                if(accountStatus.equals("1")){
+                
+                if (accountStatus.equals("1")) {
                     System.out.println("UNLOCK THIS ACCOUNT");
                     sqlite.updateLockAccountStatus(accountName,0);
                     sqlite.addLogs("NOTICE", username,"Account unlocked: "+ accountName, new Timestamp(new Date().getTime()).toString());
@@ -281,7 +272,6 @@ public class MgmtUser extends javax.swing.JPanel {
                 String origPass = password.getText();
                 String confPass = confpass.getText();
                 
-                //checks if password is strong
                 String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{15,}$";
                 Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(origPass);
