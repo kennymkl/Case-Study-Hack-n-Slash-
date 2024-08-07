@@ -205,8 +205,8 @@ public class MgmtLogs extends javax.swing.JPanel {
                     tableModel.setValueAt(timestampFld.getText(), selectedRow, 3);
 
                     sqlite.updateLogEntry(timestampFld.getText(), newEvent, newDesc);
-                    String newLog = "Edited from {" + descPrev + "} to {" + newDesc + "} TIMESTAMP: " + timestampFld.getText();
-                    sqlite.addLogs("Edited A LOG", username, newLog, new Timestamp(new Date().getTime()).toString());
+                    String newLog = "Log Editing: {" + descPrev + "} to {" + newDesc + "} TIMESTAMP: " + timestampFld.getText();
+                    sqlite.addLogs("EDIT", username, newLog, new Timestamp(new Date().getTime()).toString());
                     JOptionPane.showMessageDialog(null, "Log edited successfully", "Account Status", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     System.out.println("NOT VALID");
@@ -219,7 +219,7 @@ public class MgmtLogs extends javax.swing.JPanel {
     }//GEN-LAST:event_debugBtnActionPerformed
     
     private boolean isValidInput(String input) {
-        String regex = "^[a-zA-Z0-9 ]{1,500}$";
+        String regex = "^[a-zA-Z0-9 :]{1,500}$";
         return input.matches(regex);
     }
 
