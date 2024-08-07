@@ -8,19 +8,20 @@ package Controller;
  *
  * @author pipoc
  */
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.*;
 
 public class SessionManager {
+    public SQLite sqlite;
     private static SessionManager instance;
     private String loggedInUser;
     private Timer sessionTimer;
-    private final int SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
-//     private final int SESSION_TIMEOUT = 5 * 1000; // for testing 5 second session
+    private final int SESSION_TIMEOUT = 2 * 60 * 1000;
 
     private SessionManager() {
-        // Private constructor to prevent instantiation
     }
 
     public static SessionManager getInstance() {
@@ -37,6 +38,7 @@ public class SessionManager {
     }
 
     private void startSessionTimer() {
+        sqlite = new SQLite();
         if (sessionTimer != null) {
             sessionTimer.cancel();
         }
@@ -44,6 +46,7 @@ public class SessionManager {
         sessionTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+                sqlite.addLogs("LOGOUT", loggedInUser,"Session expired.", new Timestamp(new Date().getTime()).toString());
                 invalidateSession();
             }
         }, SESSION_TIMEOUT);
@@ -57,7 +60,6 @@ public class SessionManager {
             sessionTimer.cancel();
         }
         JOptionPane.showMessageDialog(null, "Session has expired. You will be redirected to the login page after an action is performed. Please log in again.", "Session Timeout", JOptionPane.INFORMATION_MESSAGE);
-        // You can add additional actions here, such as redirecting to the login screen
     }
 
     public boolean isSessionValid() {
@@ -71,4 +73,5 @@ public class SessionManager {
     public void resetSessionTimer() {
         startSessionTimer();
     }
+    
 }

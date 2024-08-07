@@ -187,7 +187,7 @@ public class MgmtHistory extends javax.swing.JPanel {
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtnActionPerformed
         if (!checkSessionAndRedirect()) return;
         
-        JTextField searchFld = new JTextField("0");
+        JTextField searchFld = new JTextField(null);
         designer(searchFld, "SEARCH USERNAME OR PRODUCT");
         
         //check if user input for search for users is valid
@@ -231,6 +231,7 @@ public class MgmtHistory extends javax.swing.JPanel {
                        history.get(nCtr).getName().contains(searchFld.getText())){
 
                         Product product = sqlite.getProduct(history.get(nCtr).getName());
+                        if(role == 4){
                         tableModel.addRow(new Object[]{
                             history.get(nCtr).getUsername(), 
                             history.get(nCtr).getName(), 
@@ -240,6 +241,17 @@ public class MgmtHistory extends javax.swing.JPanel {
                             history.get(nCtr).getTimestamp()
                         });
                     }
+                    else if (history.get(nCtr).getUsername().equals(username)) {
+                        tableModel.addRow(new Object[]{
+                            history.get(nCtr).getUsername(), 
+                            history.get(nCtr).getName(), 
+                            history.get(nCtr).getStock(), 
+                            product.getPrice(), 
+                            product.getPrice() * history.get(nCtr).getStock(), 
+                            history.get(nCtr).getTimestamp()
+                        });
+                    }
+                }
                 }
             }else{
                 System.out.println(matcher.matches());

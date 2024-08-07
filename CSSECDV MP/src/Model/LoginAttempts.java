@@ -20,7 +20,6 @@ public class LoginAttempts {
     
     private SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
     
-    // constructor
     public LoginAttempts(int id, String username, int attempts, String timestamp){
         this.id = id;
         this.username = username;

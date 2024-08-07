@@ -9,8 +9,12 @@ import Controller.SQLite;
 import Controller.SessionManager;
 import Model.Logs;
 import java.awt.CardLayout;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
@@ -22,25 +26,21 @@ public class MgmtLogs extends javax.swing.JPanel {
 
     public SQLite sqlite;
     public DefaultTableModel tableModel;
+    private String username;
     
-    public MgmtLogs(SQLite sqlite) {
+    public MgmtLogs(SQLite sqlite, String username) {
+        this.username = username;
         initComponents();
         this.sqlite = sqlite;
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
-        
-//        UNCOMMENT TO DISABLE BUTTONS
-//        clearBtn.setVisible(false);
-//        debugBtn.setVisible(false);
+        System.out.println("DEBUG MODE IS: "+sqlite.DEBUG_MODE);
     }
 
     public void init(){
-        //      CLEAR TABLE
         for(int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--){
             tableModel.removeRow(0);
         }
-        
-//      LOAD CONTENTS
         ArrayList<Logs> logs = sqlite.getLogs();
         for(int nCtr = 0; nCtr < logs.size(); nCtr++){
             tableModel.addRow(new Object[]{
@@ -140,18 +140,89 @@ public class MgmtLogs extends javax.swing.JPanel {
 
     private void clearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearBtnActionPerformed
         if (!checkSessionAndRedirect()) return;
+        sqlite.truncateLogs();
+        sqlite.addLogs("NOTICE", username, "Cleared logs", new Timestamp(new Date().getTime()).toString());
+        init();
     }//GEN-LAST:event_clearBtnActionPerformed
 
     private void debugBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugBtnActionPerformed
         if (!checkSessionAndRedirect()) return;
-        
-        if(sqlite.DEBUG_MODE == 1)
+       
+        if(sqlite.DEBUG_MODE == 1){
             sqlite.DEBUG_MODE = 0;
-        else
+             System.out.println("DEBUG IS ON");
+        } else {
             sqlite.DEBUG_MODE = 1;
+            System.out.println("DEBUG IS ON " + sqlite.DEBUG_MODE);
+            int selectedRow = table.getSelectedRow();
+            
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Please select a row to edit.");
+                return;
+            }
+            
+            String event = (String) tableModel.getValueAt(selectedRow, 0);
+            String user = (String) tableModel.getValueAt(selectedRow, 1);
+            String desc = (String) tableModel.getValueAt(selectedRow, 2);
+            String descPrev = (String) tableModel.getValueAt(selectedRow,2);
+            
+            Object timestampObj = tableModel.getValueAt(selectedRow, 3);
+            String timestamp = "";
+            if (timestampObj instanceof Timestamp) {
+                timestamp = ((Timestamp) timestampObj).toString();
+            } else if (timestampObj instanceof String) {
+                timestamp = (String) timestampObj;
+            }
+            
+            JTextField eventFld = new JTextField(event);
+            JTextField usernameFld = new JTextField(user);
+            JTextField descFld = new JTextField(desc);
+            JTextField timestampFld = new JTextField(timestamp);
+
+            timestampFld.setEnabled(false);
+            usernameFld.setEnabled(false);
+
+            Object[] message = {
+                "Event:", eventFld,
+                "Username:", usernameFld,
+                "Description:", descFld,
+                "Timestamp:", timestampFld
+            };
+
+            int result = JOptionPane.showConfirmDialog(null, message, "Edit Log Entry", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            if (result == JOptionPane.OK_OPTION) {
+                String newEvent = eventFld.getText();
+                String newDesc = descFld.getText();
+                System.out.println("New Event: " + newEvent);
+                System.out.println("New Description: " + newDesc);
+
+                if (isValidInput(newEvent) && isValidInput(newDesc)) {
+                    System.out.println("Timestamp used for update before db: " + timestampFld.getText());
+                    tableModel.setValueAt(newEvent, selectedRow, 0);
+                    tableModel.setValueAt(usernameFld.getText(), selectedRow, 1);
+                    tableModel.setValueAt(newDesc, selectedRow, 2);
+                    tableModel.setValueAt(timestampFld.getText(), selectedRow, 3);
+
+                    sqlite.updateLogEntry(timestampFld.getText(), newEvent, newDesc);
+                    String newLog = "Log Editing: {" + descPrev + "} to {" + newDesc + "} TIMESTAMP: " + timestampFld.getText();
+                    sqlite.addLogs("EDIT", username, newLog, new Timestamp(new Date().getTime()).toString());
+                    JOptionPane.showMessageDialog(null, "Log edited successfully", "Account Status", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    System.out.println("NOT VALID");
+                }
+            }
+            
+            sqlite.DEBUG_MODE = 0;
+        }
+        init();
     }//GEN-LAST:event_debugBtnActionPerformed
     
-    
+    private boolean isValidInput(String input) {
+        String regex = "^[a-zA-Z0-9 :]{1,500}$";
+        return input.matches(regex);
+    }
+
     private boolean checkSessionAndRedirect() {
         if (!SessionManager.getInstance().isSessionValid()) {
             JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);

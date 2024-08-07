@@ -4,11 +4,11 @@
  * and open the template in the editor.
  */
 package View;
-//[255,102,51]
+
 import Controller.SessionManager;
 import javax.swing.SwingUtilities;
 import Controller.SQLite;
-import javax.swing.JFrame; // Import JFrame instead of Frame
+import javax.swing.JFrame;
 import Model.History;
 import Model.Logs;
 import Model.Product;
@@ -37,9 +37,9 @@ public class AdminHome extends javax.swing.JPanel {
     
     public void init(SQLite sqlite, String username, int role){
         mgmtHistory = new MgmtHistory(sqlite, username, role);
-        mgmtLogs = new MgmtLogs(sqlite);
+        mgmtLogs = new MgmtLogs(sqlite, username);
         mgmtProduct = new MgmtProduct(sqlite, role);
-        mgmtUser = new MgmtUser(sqlite);
+        mgmtUser = new MgmtUser(sqlite, username);
         
         Content.setLayout(contentView);
         if (username == null) {
@@ -52,11 +52,8 @@ public class AdminHome extends javax.swing.JPanel {
         Content.add(this.mgmtProduct, "mgmtProduct");
         Content.add(this.mgmtLogs, "mgmtLogs");
         
-//        UNCOMMENT TO DISABLE BUTTONS
         historyBtn.setVisible(false);
-//        usersBtn.setVisible(false);
         productsBtn.setVisible(false);
-//        logsBtn.setVisible(false);
     }
     
     public void showPnl(String panelName){
@@ -218,10 +215,6 @@ public class AdminHome extends javax.swing.JPanel {
         }
         return true;
     }
-
-
-
-  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Content;
