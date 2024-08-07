@@ -2,9 +2,12 @@ package View;
 
 import Controller.SessionManager;
 import Controller.Main;
+import Controller.SQLite;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.sql.Timestamp;
+import java.util.Date;
 import javax.swing.WindowConstants;
 import javax.swing.JPanel;
 
@@ -12,9 +15,11 @@ public class Frame extends javax.swing.JFrame {
     
     private String username;
     private int role;
+    public SQLite sqlite;
     
     public Frame() {
         initComponents();
+        sqlite = new SQLite();
     }
 
     @SuppressWarnings("unchecked")
@@ -221,6 +226,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_clientBtnActionPerformed
 
     private void logoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutBtnActionPerformed
+        sqlite.addLogs("LOGOUT", username,"User logged out.", new Timestamp(new Date().getTime()).toString());
         SessionManager.getInstance().invalidateSession();
         frameView.show(Container, "loginPnl");
     }//GEN-LAST:event_logoutBtnActionPerformed

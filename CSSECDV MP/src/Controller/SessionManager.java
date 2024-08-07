@@ -8,15 +8,18 @@ package Controller;
  *
  * @author pipoc
  */
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.*;
 
 public class SessionManager {
+    public SQLite sqlite;
     private static SessionManager instance;
     private String loggedInUser;
     private Timer sessionTimer;
-    private final int SESSION_TIMEOUT = 30 * 60 * 1000;
+    private final int SESSION_TIMEOUT = 2 * 60 * 1000;
 
     private SessionManager() {
     }
@@ -35,6 +38,7 @@ public class SessionManager {
     }
 
     private void startSessionTimer() {
+        sqlite = new SQLite();
         if (sessionTimer != null) {
             sessionTimer.cancel();
         }
@@ -42,6 +46,7 @@ public class SessionManager {
         sessionTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+                sqlite.addLogs("LOGOUT", loggedInUser,"Session expired.", new Timestamp(new Date().getTime()).toString());
                 invalidateSession();
             }
         }, SESSION_TIMEOUT);

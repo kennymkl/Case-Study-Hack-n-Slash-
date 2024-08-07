@@ -209,16 +209,16 @@ public class Login extends javax.swing.JPanel {
         
         int numberOfAttempts = getNumberOfAttempts(usernameFld.getText());
         int accountLocked = isAccountLocked(usernameFld.getText());
+        int role = isDisabled(usernameFld.getText());
         
-        if(accountLocked == 1 && validUsername && validPassword){
+        if (role == 1){
+            JOptionPane.showMessageDialog(frame, "This account is disabled.", "Account Status", JOptionPane.INFORMATION_MESSAGE);
+            sqlite.addLogs("WARNING", usernameFld.getText(),"Login attempt from disabled account.", new Timestamp(new Date().getTime()).toString());
+            clearFields();
+        } else if(accountLocked == 1){
             JOptionPane.showMessageDialog(frame, "This account is locked. Please contact an admin.", "Account Status", JOptionPane.INFORMATION_MESSAGE);
             clearFields();
-        }
-        else if(accountLocked == 1 && (!validUsername || !validPassword)){
-            JOptionPane.showMessageDialog(frame, "This account is locked. Please contact an admin.", "Account Status", JOptionPane.INFORMATION_MESSAGE);
-            clearFields();
-        }
-        else if(validUsername && !validPassword && numberOfAttempts < maxLoginAttempts && accountLocked == 0){
+        } else if(validUsername && !validPassword && numberOfAttempts < maxLoginAttempts && accountLocked == 0){
             sqlite.updateLoginAttempts(usernameFld.getText(),new Timestamp(new Date().getTime()).toString());
             sqlite.addLogs("WARNING", usernameFld.getText(), "Login attempt. Incorrect credentials.", new Timestamp(new Date().getTime()).toString());
             JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
@@ -227,31 +227,20 @@ public class Login extends javax.swing.JPanel {
             if (numberOfAttempts >= maxLoginAttempts) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(new Date());
-                cal.add(Calendar.MINUTE, 15); 
+                cal.add(Calendar.MINUTE, 15);
                 Timestamp newTimestamp = new Timestamp(cal.getTime().getTime());
                 sqlite.updateLockAccountStatus(usernameFld.getText(),1);
+                JOptionPane.showMessageDialog(frame, "This account is locked. Please contact an admin.", "Locked Account", JOptionPane.INFORMATION_MESSAGE);
                 sqlite.addLogs("WARNING", usernameFld.getText(),"Excessive incorrect login attempts.", new Timestamp(new Date().getTime()).toString());
                 sqlite.deleteLoginAttempt(usernameFld.getText());
                 sqlite.updateLoginAttempts(usernameFld.getText(), newTimestamp.toString());
             }
             clearFields(); 
-        }
-
-        else if (validUsername && !validPassword && numberOfAttempts >= maxLoginAttempts && accountLocked == 0){
-            sqlite.updateLockAccountStatus(usernameFld.getText(),1);
-            sqlite.addLogs("WARNING", usernameFld.getText(),"Excessive incorrect login attempts.", new Timestamp(new Date().getTime()).toString());
-            sqlite.deleteLoginAttempt(usernameFld.getText());
-            JOptionPane.showMessageDialog(frame, "This account is locked. Please contact an admin.", "Locked Account", JOptionPane.INFORMATION_MESSAGE);
-            clearFields();  
-        }
-        
-        else if (!validUsername || !validPassword && accountLocked == 0){
+        } else if (!validUsername || !validPassword && accountLocked == 0){
             JOptionPane.showMessageDialog(frame, "The username or password is incorrect.", "Invalid username or password", JOptionPane.INFORMATION_MESSAGE);
             clearFields();
-        }
-        
-        else if (validUsername && validPassword && accountLocked == 0 && numberOfAttempts < maxLoginAttempts){
-            System.out.println(numberOfAttempts);
+        } else if (validUsername && validPassword && accountLocked == 0 && numberOfAttempts < maxLoginAttempts){
+            sqlite.addLogs("LOGIN", usernameFld.getText(),"User logged in.", new Timestamp(new Date().getTime()).toString());
             sqlite.deleteLoginAttempt(usernameFld.getText());
             clearFields();
             SessionManager.getInstance().startSession(username);
@@ -354,6 +343,16 @@ public class Login extends javax.swing.JPanel {
          for(int nCtr = 0; nCtr < users.size(); nCtr++){
             if(username.equals(users.get(nCtr).getUsername())){
                 return users.get(nCtr).getLocked();
+            }
+        }
+        return -1;
+    }
+    
+    private int isDisabled(String username) {
+        ArrayList<User> users = sqlite.getUsers();
+         for(int nCtr = 0; nCtr < users.size(); nCtr++){
+            if(username.equals(users.get(nCtr).getUsername())){
+                return users.get(nCtr).getRole();
             }
         }
         return -1;
